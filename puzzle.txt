@@ -1,0 +1,4 @@
+i plan story/puzzle order like this:
+
+1. player given all dead body details and killer clue, search missing people db
+2. 
