@@ -81,12 +81,16 @@ const MusicPlayer = () => {
     const audio = audioRef.current;
 
     const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime);
-      setProgress((audio.currentTime / audio.duration) * 100);
+      setCurrentTime(audio.currentTime || 0);
+      // Ensure we don't divide by NaN or 0
+      const calculatedProgress = !audio.duration
+        ? 0
+        : (audio.currentTime / audio.duration) * 100;
+      setProgress(isNaN(calculatedProgress) ? 0 : calculatedProgress);
     };
 
     const handleDurationChange = () => {
-      setDuration(audio.duration);
+      setDuration(audio.duration || 0);
     };
 
     const handleEnded = () => {
