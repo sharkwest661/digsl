@@ -105,6 +105,38 @@
     color: $cyber-neon-pink;
     box-shadow: 0 0 5px rgba($cyber-neon-pink, 0.5);
   }
+
+  &.minimized {
+    background-color: rgba($cyber-dark-blue, 0.3);
+    border-color: rgba($cyber-electric-blue, 0.4);
+    opacity: 0.8;
+
+    .windowTitle {
+      color: rgba($cyber-text-light, 0.6);
+    }
+
+    // Add minimize indicator
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 4px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      background-color: $cyber-electric-blue;
+      border-radius: 1px;
+    }
+
+    &:hover {
+      opacity: 1;
+      border-color: $cyber-electric-blue;
+
+      .windowTitle {
+        color: $cyber-text-light;
+      }
+    }
+  }
 }
 
 .windowTitle {

@@ -10,10 +10,12 @@ const Window = ({
   children,
   initialPosition = { x: 100, y: 100, width: 600, height: 400 },
   isActive = false,
+  isMinimized = false,
   zIndex = 10,
   resizable = false,
   onClose,
   onFocus,
+  onMinimize,
   className = "",
   hideControls = false,
   darkHackerTheme = false,
@@ -41,6 +43,14 @@ const Window = ({
     e.stopPropagation();
     if (onClose) {
       onClose(id);
+    }
+  };
+
+  // Minimize window
+  const handleMinimize = (e) => {
+    e.stopPropagation();
+    if (onMinimize) {
+      onMinimize(id);
     }
   };
 
@@ -100,11 +110,17 @@ const Window = ({
     setPosition(initialPosition);
   }, [initialPosition]);
 
+  // Don't render if window is minimized
+  if (isMinimized) {
+    return null;
+  }
+
   // Combine class names
   const windowClass = [
     styles.window,
     isActive ? styles.active : "",
     isDragging ? styles.dragging : "",
+    isMinimized ? styles.minimized : "",
     darkHackerTheme ? styles.darkHacker : "",
     className,
   ]
@@ -138,11 +154,11 @@ const Window = ({
     <Rnd
       ref={windowRef}
       className={windowClass}
-      style={{ zIndex }}
+      style={{ zIndex, display: isMinimized ? "none" : "flex" }}
       position={{ x: position.x, y: position.y }}
       size={{ width: position.width, height: position.height }}
-      enableResizing={resizable && !isDragging}
-      disableDragging={false}
+      enableResizing={resizable && !isDragging && !isMinimized}
+      disableDragging={isMinimized}
       dragHandleClassName="window-drag-handle"
       cancel=".window-no-drag"
       enableUserSelectHack={false} // Important performance fix
@@ -159,12 +175,20 @@ const Window = ({
         <div className={titleClass}>{title}</div>
 
         {!hideControls && (
-          <button
-            onClick={handleClose}
-            className={`${styles.closeButton} window-no-drag`}
-            aria-label="Close window"
-            type="button"
-          />
+          <div className={styles.windowControls}>
+            <button
+              onClick={handleMinimize}
+              className={`${styles.minimizeButton} window-no-drag`}
+              aria-label="Minimize window"
+              type="button"
+            />
+            <button
+              onClick={handleClose}
+              className={`${styles.closeButton} window-no-drag`}
+              aria-label="Close window"
+              type="button"
+            />
+          </div>
         )}
       </div>
 
@@ -173,7 +197,7 @@ const Window = ({
         {/* The key is to keep children mounted but apply optimizations via CSS */}
         {children}
 
-        {/* Apply scanlines effect if enabled and not dragging */}
+        {/* Apply scanlines effect if enabled */}
         {effectsEnabled?.scanlines && !isDragging && (
           <Scanlines opacity={0.15} />
         )}

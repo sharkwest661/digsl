@@ -7,6 +7,7 @@ import {
 } from "./themeStore";
 import { useWindowsStore, APP_TYPES } from "./windowsStore";
 import { useNotepadStore } from "./notepadStore";
+import { useAudioStore } from "./audioStore";
 
 // Export all stores and constants
 export {
@@ -24,4 +25,7 @@ export {
 
   // Notepad store
   useNotepadStore,
+
+  // Audio store
+  useAudioStore,
 };

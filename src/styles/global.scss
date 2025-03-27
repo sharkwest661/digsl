@@ -46,6 +46,11 @@ button {
   box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.9);
 }
 
+*::selection {
+  background-color: rgba($cyber-cyan, 0.7);
+  color: white;
+}
+
 /* Firefox scrollbar compatibility */
 * {
   scrollbar-width: thin;

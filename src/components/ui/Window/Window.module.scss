@@ -75,9 +75,14 @@
   }
 }
 
+.windowControls {
+  display: flex;
+  gap: 8px;
+}
+
 .closeButton {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
   background-color: $cyber-warning-red;
   border: none;
@@ -134,5 +139,38 @@
 
   &.darkHacker {
     background-color: $hacker-bg;
+  }
+}
+
+.minimizeButton {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background-color: $cyber-electric-blue;
+  border: none;
+  transition: transform $transition-standard ease,
+    box-shadow $transition-standard ease;
+  cursor: pointer;
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 10px;
+    height: 2px;
+    background-color: rgba(0, 0, 0, 0.6);
+    border-radius: 1px;
+  }
+
+  &:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba($cyber-electric-blue, 0.8);
+  }
+
+  &:active {
+    transform: scale(0.95);
   }
 }

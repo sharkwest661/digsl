@@ -23,7 +23,7 @@ const DEFAULT_POSITIONS = {
   [APP_TYPES.EMAIL]: { x: 140, y: 140, width: 650, height: 500 },
   [APP_TYPES.NOTEPAD]: { x: 160, y: 160, width: 750, height: 600 },
   [APP_TYPES.FILE_EXPLORER]: { x: 180, y: 180, width: 600, height: 450 },
-  [APP_TYPES.MUSIC_PLAYER]: { x: 200, y: 200, width: 350, height: 500 },
+  [APP_TYPES.MUSIC_PLAYER]: { x: 200, y: 200, width: 350, height: 580 },
   [APP_TYPES.HACKING_TOOL]: { x: 220, y: 220, width: 650, height: 500 },
 };
 
@@ -61,6 +61,7 @@ const useWindowsStore = create((set, get) => ({
       title: title || `${appType} Window`,
       position,
       zIndex: windows.length + 1, // Place on top
+      isMinimized: false, // Track minimized state
       props: { ...props },
     };
 
@@ -119,7 +120,11 @@ const useWindowsStore = create((set, get) => ({
       // Update windows z-indices
       const updatedWindows = state.windows.map((window) => {
         if (window.id === windowId) {
-          return { ...window, zIndex: maxZIndex + 1 };
+          return {
+            ...window,
+            zIndex: maxZIndex + 1,
+            isMinimized: false, // Restore window if minimized
+          };
         }
         return window;
       });
@@ -127,6 +132,45 @@ const useWindowsStore = create((set, get) => ({
       return {
         windows: updatedWindows,
         activeWindowId: windowId,
+      };
+    });
+  },
+
+  // Toggle window minimized state
+  toggleMinimize: (windowId) => {
+    set((state) => {
+      const window = state.windows.find((w) => w.id === windowId);
+
+      if (!window) return state;
+
+      // Toggle minimize state
+      const isMinimized = !window.isMinimized;
+
+      // Update windows
+      const updatedWindows = state.windows.map((w) =>
+        w.id === windowId ? { ...w, isMinimized } : w
+      );
+
+      // If minimizing the active window, set active to null
+      let activeId = state.activeWindowId;
+      if (isMinimized && state.activeWindowId === windowId) {
+        // Find next visible window with highest z-index
+        const visibleWindows = updatedWindows.filter((w) => !w.isMinimized);
+        if (visibleWindows.length > 0) {
+          const nextActive = visibleWindows.reduce(
+            (highest, window) =>
+              window.zIndex > highest.zIndex ? window : highest,
+            visibleWindows[0]
+          );
+          activeId = nextActive.id;
+        } else {
+          activeId = null;
+        }
+      }
+
+      return {
+        windows: updatedWindows,
+        activeWindowId: activeId,
       };
     });
   },

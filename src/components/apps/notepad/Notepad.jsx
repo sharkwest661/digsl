@@ -16,6 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import ConfirmationModal from "../../common/ConfirmationModal";
 import { useThemeStore, useNotepadStore } from "../../../store";
 import { formatDate } from "../../../utils/formatters";
 import styles from "./Notepad.module.scss";
@@ -41,6 +42,7 @@ const Notepad = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [charCount, setCharCount] = useState(0);
   const [wordCount, setWordCount] = useState(0);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const textAreaRef = useRef(null);
   const titleInputRef = useRef(null);
@@ -155,13 +157,18 @@ const Notepad = () => {
     setIsEditing(true);
   }, [createNote, setActiveNote]);
 
+  // Show delete confirmation modal
+  const handleDeleteClick = useCallback(() => {
+    if (activeNote) {
+      setShowDeleteModal(true);
+    }
+  }, [activeNote]);
+
   // Delete the active note
-  const handleDeleteNote = useCallback(() => {
-    if (
-      activeNote &&
-      window.confirm("Are you sure you want to delete this note?")
-    ) {
+  const handleDeleteConfirm = useCallback(() => {
+    if (activeNote) {
       deleteNote(activeNote.id);
+      setShowDeleteModal(false);
     }
   }, [activeNote, deleteNote]);
 
@@ -276,7 +283,7 @@ const Notepad = () => {
               </button>
 
               <button
-                onClick={handleDeleteNote}
+                onClick={handleDeleteClick}
                 className={styles.toolbarButton}
                 title="Delete Note"
               >
@@ -345,6 +352,19 @@ const Notepad = () => {
             </>
           )}
         </div>
+
+        {/* Confirmation Modal */}
+        <ConfirmationModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          onConfirm={handleDeleteConfirm}
+          title="Delete Note"
+          message={`Are you sure you want to delete "${
+            activeNote?.title || "Untitled Note"
+          }"? This action cannot be undone.`}
+          confirmText="Delete"
+          cancelText="Cancel"
+        />
       </div>
     </div>
   );
