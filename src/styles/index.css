@@ -181,3 +181,39 @@ input[type="range"]::-moz-range-thumb {
 .dragging {
   cursor: url("/assets/cursors/move.svg") 16 16, grabbing !important;
 } */
+
+/* Hide default range thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 16px;
+  width: 16px;
+  opacity: 0;
+}
+
+input[type="range"]::-moz-range-thumb {
+  height: 16px;
+  width: 16px;
+  opacity: 0;
+}
+
+/* Optimize window dragging performance */
+.react-draggable-dragging {
+  cursor: move !important;
+  user-select: none !important;
+  will-change: transform !important;
+  pointer-events: none !important; /* Prevents hover effects during drag */
+}
+
+/* Optimize animation performance */
+.animate-hardware {
+  transform: translateZ(0);
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+}
+
+/* Better scrollbar performance */
+.high-performance-scroll {
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  will-change: scroll-position;
+}

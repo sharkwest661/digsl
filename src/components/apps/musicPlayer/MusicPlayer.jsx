@@ -8,8 +8,15 @@ import {
   Volume2,
   Volume1,
   VolumeX,
+  List,
+  Grid,
+  Music,
+  Heart,
+  HeartOff,
 } from "lucide-react";
 import { useAppStore, useThemeStore } from "../../../store";
+import { Button } from "../../ui";
+import { PLAYLIST_DATA } from "../../../constants/musicData";
 
 const MusicPlayer = () => {
   // Get theme configuration
@@ -23,92 +30,43 @@ const MusicPlayer = () => {
   const volume = useAppStore((state) => state.volume);
   const setVolume = useAppStore((state) => state.setVolume);
 
+  // Local state
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
-  const [showPlaylist, setShowPlaylist] = useState(false);
-  const [previousVolume, setPreviousVolume] = useState(40); // Store previous volume level
-  const [visualizerCells, setVisualizerCells] = useState([]);
+  const [selectedView, setSelectedView] = useState("player"); // 'player' or 'playlist'
+  const [favorites, setFavorites] = useState([]);
+  const [previousVolume, setPreviousVolume] = useState(40);
+  const [visualizerData, setVisualizerData] = useState([]);
 
   const audioRef = useRef(null);
+  const visualizerRef = useRef(null);
 
   // Mock playlist data with actual file paths
-  const playlist = [
-    {
-      id: 1,
-      title: "Sahte",
-      artist: "Hande Yener",
-      duration: "3:45",
-      active: true,
-      file: "/assets/music/hande_yener_sahte.mp3",
-    },
-    {
-      id: 2,
-      title: "Oyun Bitti",
-      artist: "Sertab Erener",
-      duration: "4:21",
-      active: false,
-      file: "/assets/music/sertab_erener_oyun_bitti.mp3",
-    },
-    {
-      id: 3,
-      title: "Intikam",
-      artist: "Demet Akalin",
-      duration: "4:21",
-      active: false,
-      file: "/assets/music/demet_akalin_intikam.mp3",
-    },
-    {
-      id: 4,
-      title: "Hardadir",
-      artist: "Qaraqan",
-      duration: "4:21",
-      active: false,
-      file: "/assets/music/qaraqan_hardadir.mp3",
-    },
-    {
-      id: 5,
-      title: "Talking in your sleep",
-      artist: "The Romantics",
-      duration: "4:21",
-      active: false,
-      file: "/assets/music/talking_in_your_sleep_the_romantics.mp3",
-    },
-    {
-      id: 6,
-      title: "Virtual World",
-      artist: "Fibre",
-      duration: "4:21",
-      active: false,
-      file: "/assets/music/virtual_world_fibre.mp3",
-    },
-  ];
+  const playlist = PLAYLIST_DATA;
 
-  // Initialize visualizer cells with random values
+  // Initialize visualizer
   useEffect(() => {
-    // Generate random opacity and animation values for each cell
-    const cells = Array.from({ length: 64 }).map((_, i) => ({
-      animationDelay: `${Math.random() * 2}s`,
-      animationDuration: `${0.5 + Math.random() * 2}s`,
-      baseOpacity: 0.1 + Math.random() * 0.2,
-    }));
-    setVisualizerCells(cells);
+    generateVisualizerData();
   }, []);
 
-  // Update visualizer animation while playing
+  // Generate new visualizer data
+  const generateVisualizerData = () => {
+    const barCount = 32;
+    const newData = Array.from({ length: barCount }).map(() => ({
+      height: Math.random() * 80 + 20,
+      opacity: Math.random() * 0.5 + 0.5,
+      animationDuration: (Math.random() * 1 + 0.5).toFixed(2),
+    }));
+    setVisualizerData(newData);
+  };
+
+  // Update visualizer animation when playing changes
   useEffect(() => {
     if (!isPlaying) return;
 
-    // Update cell opacities at intervals when playing
     const intervalId = setInterval(() => {
-      setVisualizerCells((cells) =>
-        cells.map((cell) => ({
-          ...cell,
-          // Only update some cells randomly
-          baseOpacity:
-            Math.random() > 0.7 ? 0.1 + Math.random() * 0.2 : cell.baseOpacity,
-        }))
-      );
+      generateVisualizerData();
     }, 1000);
 
     return () => clearInterval(intervalId);
@@ -158,14 +116,10 @@ const MusicPlayer = () => {
 
   // Handle track changes
   useEffect(() => {
-    // Store the current playback position and playing state before changing tracks
     const wasPlaying = isPlaying;
-
-    // Update audio source
     audioRef.current.src = playlist[currentTrack].file;
     audioRef.current.load();
 
-    // If it was playing before, resume playback after track change
     if (wasPlaying) {
       audioRef.current
         .play()
@@ -204,10 +158,6 @@ const MusicPlayer = () => {
     audioRef.current.currentTime = (newProgress / 100) * duration;
   };
 
-  const togglePlaylist = () => {
-    setShowPlaylist(!showPlaylist);
-  };
-
   const selectTrack = (index) => {
     setCurrentTrack(index);
     setIsPlaying(true);
@@ -223,99 +173,91 @@ const MusicPlayer = () => {
 
   // Volume icon logic
   const getVolumeIcon = () => {
-    if (volume === 0) return <VolumeX size={20} />;
-    if (volume < 50) return <Volume1 size={20} />;
-    return <Volume2 size={20} />;
+    if (volume === 0) return <VolumeX size={18} />;
+    if (volume < 50) return <Volume1 size={18} />;
+    return <Volume2 size={18} />;
   };
 
   // Mute/unmute toggle function
   const muteVolume = () => {
     if (volume === 0) {
-      // If currently muted, restore to previous volume
       setVolume(previousVolume);
     } else {
-      // If not muted, save current volume and set to 0
       setPreviousVolume(volume);
       setVolume(0);
     }
   };
 
-  return (
-    <div
-      className="w-full h-full flex flex-col overflow-auto p-4 bg-opacity-80"
-      style={{ backgroundColor: "rgba(18, 4, 88, 0.7)" }}
-    >
-      {/* Audio element */}
-      <audio ref={audioRef} preload="metadata" />
+  // Toggle favorite status
+  const toggleFavorite = (trackId) => {
+    if (favorites.includes(trackId)) {
+      setFavorites(favorites.filter((id) => id !== trackId));
+    } else {
+      setFavorites([...favorites, trackId]);
+    }
+  };
 
-      {/* Header */}
+  // Player view
+  const renderPlayerView = () => (
+    <div className="flex flex-col h-full">
+      {/* Visualizer */}
       <div
-        className="h-2 mb-6"
+        ref={visualizerRef}
+        className="flex items-end justify-center h-48 mb-6 px-4 py-2"
         style={{
-          background: `linear-gradient(to right, ${themeConfig.accentPrimary}, ${themeConfig.accentSecondary})`,
-          boxShadow: themeConfig.glowEffect,
+          backgroundColor: "rgba(0,0,0,0.2)",
+          borderRadius: "4px",
+          border: `1px solid ${themeConfig.accentSecondary}`,
+          boxShadow: `inset 0 0 10px rgba(0,0,0,0.5)`,
+          overflow: "hidden",
         }}
-      ></div>
-
-      <div className="p-4 flex justify-center items-center mb-4">
-        <h2
-          className="text-xl font-bold font-mono uppercase text-center"
-          style={{ color: themeConfig.accentSecondary }}
-        >
-          AUDIO PLAYER
-        </h2>
-      </div>
-
-      {/* Album art & visualizer */}
-      <div className="flex justify-center w-full mb-6">
-        <div
-          className="relative w-44 h-44 overflow-hidden"
-          style={{
-            border: `3px solid ${themeConfig.accentPrimary}`,
-            boxShadow: themeConfig.glowEffect,
-          }}
-        >
-          <div className="absolute inset-0 grid grid-cols-8 grid-rows-8 gap-px pointer-events-none">
-            {visualizerCells.map((cell, i) => (
-              <div
-                key={i}
-                className={`${
-                  isPlaying ? "animate-pulse" : ""
-                } transition-all duration-300`}
-                style={{
-                  backgroundColor: themeConfig.accentPrimary,
-                  animationDelay: cell.animationDelay,
-                  animationDuration: cell.animationDuration,
-                  opacity: isPlaying
-                    ? cell.baseOpacity + Math.random() * 0.3
-                    : cell.baseOpacity,
-                }}
-              ></div>
-            ))}
-          </div>
+      >
+        {visualizerData.map((bar, i) => (
           <div
-            className="absolute inset-0 flex items-center justify-center text-lg font-bold font-mono text-center"
-            style={{ color: themeConfig.accentSecondary }}
-          >
-            MUSIC VISUALIZER
-          </div>
-        </div>
+            key={i}
+            className="mx-px"
+            style={{
+              height: `${isPlaying ? bar.height : 10}%`,
+              width: "6px",
+              backgroundColor: themeConfig.accentPrimary,
+              opacity: isPlaying ? bar.opacity : 0.3,
+              transition: `height ${bar.animationDuration}s ease`,
+              boxShadow: `0 0 5px ${themeConfig.accentPrimary}`,
+            }}
+          />
+        ))}
       </div>
 
       {/* Track info */}
       <div className="px-6 mb-6 text-center">
         <h3
-          className="text-lg font-bold text-white truncate"
-          style={{ textShadow: `0 0 5px ${themeConfig.accentPrimary}` }}
+          className="text-2xl font-bold truncate"
+          style={{
+            color: themeConfig.accentPrimary,
+            textShadow: `0 0 5px ${themeConfig.accentPrimary}`,
+          }}
         >
           {playlist[currentTrack].title}
         </h3>
-        <p
-          className="text-sm mb-2"
-          style={{ color: themeConfig.accentSecondary }}
-        >
+        <p className="text-base mb-1" style={{ color: themeConfig.textLight }}>
           {playlist[currentTrack].artist}
         </p>
+        <div className="flex justify-center items-center mt-2">
+          <button
+            onClick={() => toggleFavorite(playlist[currentTrack].id)}
+            className="p-1 transition-all duration-200"
+          >
+            {favorites.includes(playlist[currentTrack].id) ? (
+              <Heart
+                size={18}
+                fill={themeConfig.accentPrimary}
+                color={themeConfig.accentPrimary}
+              />
+            ) : (
+              <HeartOff size={18} color={themeConfig.textLight} />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Progress bar */}
@@ -326,12 +268,19 @@ const MusicPlayer = () => {
           max="100"
           value={progress}
           onChange={handleProgressChange}
-          className="w-full h-1 appearance-none rounded-full overflow-hidden cursor-pointer"
+          className="w-full cursor-pointer"
           style={{
-            background: `linear-gradient(to right, ${themeConfig.accentPrimary} 0%, ${themeConfig.accentPrimary} ${progress}%, #1f2937 ${progress}%, #1f2937 100%)`,
+            height: "4px",
+            background: `linear-gradient(to right, ${themeConfig.accentPrimary} 0%, ${themeConfig.accentPrimary} ${progress}%, rgba(31, 41, 55, 0.7) ${progress}%, rgba(31, 41, 55, 0.7) 100%)`,
+            borderRadius: "2px",
+            boxShadow: `0 0 5px ${themeConfig.accentPrimary}`,
+            WebkitAppearance: "none",
           }}
         />
-        <div className="flex justify-between text-xs text-gray-400 mt-1">
+        <div
+          className="flex justify-between text-xs mt-1 font-mono"
+          style={{ color: "rgba(255,255,255,0.6)" }}
+        >
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
@@ -343,21 +292,22 @@ const MusicPlayer = () => {
           onClick={handlePrev}
           className="text-white hover:text-cyan-400 transition-colors"
         >
-          <SkipBack size={32} />
+          <SkipBack size={24} />
         </button>
 
         <button
           onClick={handlePlay}
-          className="w-14 h-14 rounded-full flex items-center justify-center text-black transition-all"
+          className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
           style={{
-            background: `linear-gradient(to right, ${themeConfig.accentPrimary}, ${themeConfig.accentSecondary})`,
-            boxShadow: themeConfig.glowEffect,
+            background: `linear-gradient(135deg, ${themeConfig.accentPrimary} 0%, ${themeConfig.accentSecondary} 100%)`,
+            boxShadow: `0 0 15px ${themeConfig.accentPrimary}`,
+            transform: isPlaying ? "scale(1.05)" : "scale(1)",
           }}
         >
           {isPlaying ? (
-            <Pause size={28} />
+            <Pause size={24} color="#000" />
           ) : (
-            <Play size={28} className="ml-1" />
+            <Play size={24} color="#000" className="ml-1" />
           )}
         </button>
 
@@ -365,103 +315,293 @@ const MusicPlayer = () => {
           onClick={handleNext}
           className="text-white hover:text-cyan-400 transition-colors"
         >
-          <SkipForward size={32} />
+          <SkipForward size={24} />
         </button>
       </div>
 
       {/* Volume slider */}
-      <div className="px-6 flex items-center space-x-2 mb-6">
+      <div className="px-6 flex items-center gap-2 mt-8 mb-2">
+        {/* Button with pure Tailwind styling */}
         <button
-          className="text-white hover:text-cyan-400 transition-colors"
+          className="text-white hover:text-cyan-400 transition-colors p-2 rounded-full hover:bg-black hover:bg-opacity-20"
           onClick={muteVolume}
         >
           {getVolumeIcon()}
         </button>
-        <input
-          type="range"
-          min="0"
-          max="100"
-          value={volume}
-          onChange={handleVolumeChange}
-          className="flex-1 h-1 appearance-none rounded-full overflow-hidden cursor-pointer"
-          style={{
-            background: `linear-gradient(to right, ${themeConfig.accentPrimary} 0%, ${themeConfig.accentPrimary} ${volume}%, #1f2937 ${volume}%, #1f2937 100%)`,
-          }}
-        />
-      </div>
 
-      {/* Playlist toggle button */}
-      <div className="px-6 mb-4 mt-auto">
-        <button
-          onClick={togglePlaylist}
-          className="w-full py-2 rounded-md text-sm font-bold tracking-wider font-mono uppercase transition-colors"
-          style={{
-            border: `1px solid ${themeConfig.accentPrimary}`,
-            color: themeConfig.accentSecondary,
-            background: showPlaylist ? "rgba(0,0,0,0.3)" : "transparent",
-          }}
-        >
-          {showPlaylist ? "HIDE PLAYLIST" : "SHOW PLAYLIST"}
-        </button>
-      </div>
+        {/* Custom slider container with Tailwind */}
+        <div className="flex-1 relative h-8 flex items-center">
+          {/* Background track using Tailwind only */}
+          <div className="absolute w-full h-1 bg-gray-800 bg-opacity-50 rounded"></div>
 
-      {/* Playlist with sliding animation */}
+          {/* Colored progress bar using Tailwind + custom width */}
+          <div
+            className="absolute h-1 bg-cyan-400 rounded"
+            style={{
+              width: `${volume}%`,
+              boxShadow: `0 0 5px ${themeConfig.accentSecondary}`,
+            }}
+          ></div>
+
+          {/* Actual input with opacity-0 for browser compatibility */}
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={volume}
+            onChange={handleVolumeChange}
+            className="absolute w-full cursor-pointer opacity-0 z-10"
+          />
+
+          {/* Thumb indicator using Tailwind */}
+          <div
+            className="absolute w-3 h-3 rounded-full bg-cyan-400 z-0 pointer-events-none"
+            style={{
+              left: `calc(${volume}% - 6px)`,
+              boxShadow: `0 0 5px ${themeConfig.accentSecondary}`,
+            }}
+          ></div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Playlist view
+  const renderPlaylistView = () => (
+    <div className="h-full flex flex-col">
       <div
-        className="overflow-hidden transition-all duration-300 ease-in-out"
+        className="px-4 py-3 font-mono flex items-center justify-between"
         style={{
-          height: showPlaylist ? "35%" : "0",
-          opacity: showPlaylist ? 1 : 0,
-          marginTop: showPlaylist ? "1rem" : "0",
-          transitionProperty: "height, opacity, margin",
+          borderBottom: `1px solid ${themeConfig.accentSecondary}`,
+          backgroundColor: "rgba(0,0,0,0.2)",
         }}
       >
-        <div
-          className="px-4 overflow-y-auto"
-          style={{ height: "100%", paddingBottom: "8px" }}
-        >
-          {playlist.map((track, index) => (
-            <div
-              key={track.id}
-              onClick={() => selectTrack(index)}
-              className="p-3 mb-2 rounded cursor-pointer transition-all hover:bg-opacity-30"
-              style={{
-                backgroundColor:
-                  index === currentTrack ? "rgba(0,0,0,0.3)" : "transparent",
-                border:
-                  index === currentTrack
-                    ? `1px solid ${themeConfig.accentPrimary}`
-                    : "none",
-                color:
-                  index === currentTrack
-                    ? themeConfig.accentPrimary
-                    : "#f5f5f5",
-                boxShadow:
-                  index === currentTrack
-                    ? `0 0 5px ${themeConfig.accentPrimary}`
-                    : "none",
-              }}
-            >
-              <div className="flex justify-between items-center">
-                <div className="flex items-center">
-                  <span className="mr-2 w-4 text-xs">{index + 1}</span>
-                  <div>
-                    <div className="font-medium">{track.title}</div>
-                    <div className="text-xs text-gray-400">{track.artist}</div>
-                  </div>
-                </div>
-                <span className="text-xs text-gray-400">{track.duration}</span>
-              </div>
-            </div>
-          ))}
+        <h3 style={{ color: themeConfig.accentSecondary }}>TRACKS</h3>
+        <div className="text-xs" style={{ color: themeConfig.textLight }}>
+          {playlist.length} songs
         </div>
       </div>
 
-      {/* Additional style fixes */}
+      <div className="flex-1 overflow-y-auto custom-scrollbar">
+        {playlist.map((track, index) => (
+          <div
+            key={track.id}
+            onClick={() => selectTrack(index)}
+            className="p-3 mb-1 mx-2 rounded cursor-pointer transition-all duration-200 flex items-center"
+            style={{
+              backgroundColor:
+                index === currentTrack
+                  ? "rgba(255,255,255,0.05)"
+                  : "transparent",
+              borderBottom: `1px solid rgba(255,255,255,0.05)`,
+              borderLeft:
+                index === currentTrack
+                  ? `2px solid ${themeConfig.accentPrimary}`
+                  : "2px solid transparent",
+            }}
+          >
+            <div
+              className="w-8 font-mono text-center mr-3"
+              style={{
+                color:
+                  index === currentTrack
+                    ? themeConfig.accentPrimary
+                    : "rgba(255,255,255,0.4)",
+              }}
+            >
+              {isPlaying && index === currentTrack ? (
+                <div className="flex justify-center">
+                  <div className="playing-animation">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                  </div>
+                </div>
+              ) : (
+                <span>{String(index + 1).padStart(2, "0")}</span>
+              )}
+            </div>
+
+            <div className="flex-1 truncate">
+              <div
+                className="font-medium truncate"
+                style={{
+                  color:
+                    index === currentTrack
+                      ? themeConfig.accentPrimary
+                      : themeConfig.textLight,
+                }}
+              >
+                {track.title}
+              </div>
+              <div
+                className="text-xs truncate"
+                style={{ color: "rgba(255,255,255,0.6)" }}
+              >
+                {track.artist}
+              </div>
+            </div>
+
+            <div className="flex items-center">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  toggleFavorite(track.id);
+                }}
+                className="p-2 opacity-60 hover:opacity-100 transition-opacity"
+              >
+                {favorites.includes(track.id) ? (
+                  <Heart
+                    size={14}
+                    fill={themeConfig.accentPrimary}
+                    color={themeConfig.accentPrimary}
+                  />
+                ) : (
+                  <Heart size={14} color={themeConfig.textLight} />
+                )}
+              </button>
+
+              <div
+                className="text-xs !ml-2 font-mono"
+                style={{ color: "rgba(255,255,255,0.4)" }}
+              >
+                {track.duration}
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div
+        className="p-3 flex items-center justify-center"
+        style={{
+          borderTop: `1px solid ${themeConfig.accentSecondary}`,
+          backgroundColor: "rgba(0,0,0,0.2)",
+        }}
+      >
+        <div className="text-xs" style={{ color: themeConfig.textLight }}>
+          {formatTime(currentTime)} / {formatTime(duration)}
+        </div>
+      </div>
+    </div>
+  );
+
+  return (
+    <div
+      className="w-full h-full flex flex-col relative"
+      style={{ backgroundColor: themeConfig.darkBg }}
+    >
+      {/* Audio element */}
+      <audio ref={audioRef} preload="metadata" />
+
+      {/* Navigation tabs */}
+      <div
+        className="flex border-b border-opacity-20"
+        style={{
+          borderColor: themeConfig.accentSecondary,
+        }}
+      >
+        <button
+          className={`flex-1 py-3 px-4 font-mono text-sm uppercase tracking-wider transition-all duration-200 ${
+            selectedView === "player" ? "border-b-2" : ""
+          }`}
+          style={{
+            borderColor: themeConfig.accentPrimary,
+            color:
+              selectedView === "player"
+                ? themeConfig.accentPrimary
+                : themeConfig.textLight,
+            backgroundColor:
+              selectedView === "player" ? "rgba(0,0,0,0.2)" : "transparent",
+          }}
+          onClick={() => setSelectedView("player")}
+        >
+          <div className="flex items-center justify-center">
+            <Music size={16} className="mr-2" />
+            Player
+          </div>
+        </button>
+
+        <button
+          className={`flex-1 py-3 px-4 font-mono text-sm uppercase tracking-wider transition-all duration-200 ${
+            selectedView === "playlist" ? "border-b-2" : ""
+          }`}
+          style={{
+            borderColor: themeConfig.accentPrimary,
+            color:
+              selectedView === "playlist"
+                ? themeConfig.accentPrimary
+                : themeConfig.textLight,
+            backgroundColor:
+              selectedView === "playlist" ? "rgba(0,0,0,0.2)" : "transparent",
+          }}
+          onClick={() => setSelectedView("playlist")}
+        >
+          <div className="flex items-center justify-center">
+            <List size={16} className="mr-2" />
+            Playlist
+          </div>
+        </button>
+      </div>
+
+      {/* Content area */}
+      <div className="flex-1 overflow-hidden p-4">
+        {selectedView === "player" ? renderPlayerView() : renderPlaylistView()}
+      </div>
+
+      {/* Animated playing indicator style */}
       <style jsx>{`
-        input[type="range"] {
-          -webkit-appearance: none;
-          height: 4px;
-          background: transparent;
+        .playing-animation {
+          display: flex;
+          align-items: flex-end;
+          height: 16px;
+          gap: 1px;
+        }
+
+        .playing-animation span {
+          display: block;
+          width: 2px;
+          background-color: ${themeConfig.accentPrimary};
+          animation: playing-animation 1.2s ease infinite;
+          box-shadow: 0 0 2px ${themeConfig.accentPrimary};
+        }
+
+        .playing-animation span:nth-child(1) {
+          height: 8px;
+          animation-delay: 0s;
+        }
+
+        .playing-animation span:nth-child(2) {
+          height: 16px;
+          animation-delay: 0.2s;
+        }
+
+        .playing-animation span:nth-child(3) {
+          height: 10px;
+          animation-delay: 0.4s;
+        }
+
+        @keyframes playing-animation {
+          0%,
+          100% {
+            height: 4px;
+          }
+          50% {
+            height: 12px;
+          }
+        }
+
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 4px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.2);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: ${themeConfig.accentSecondary};
+          border-radius: 4px;
         }
 
         input[type="range"]::-webkit-slider-thumb {
@@ -469,8 +609,8 @@ const MusicPlayer = () => {
           width: 12px;
           height: 12px;
           border-radius: 50%;
-          background: ${themeConfig.accentPrimary};
-          box-shadow: 0 0 5px ${themeConfig.accentPrimary};
+          background: ${themeConfig.accentSecondary};
+          box-shadow: 0 0 5px ${themeConfig.accentSecondary};
           cursor: pointer;
           margin-top: -4px;
         }
@@ -480,23 +620,9 @@ const MusicPlayer = () => {
           height: 12px;
           border: none;
           border-radius: 50%;
-          background: ${themeConfig.accentPrimary};
-          box-shadow: 0 0 5px ${themeConfig.accentPrimary};
+          background: ${themeConfig.accentSecondary};
+          box-shadow: 0 0 5px ${themeConfig.accentSecondary};
           cursor: pointer;
-        }
-
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 0.1;
-          }
-          50% {
-            opacity: 0.5;
-          }
-        }
-
-        .animate-pulse {
-          animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}</style>
     </div>

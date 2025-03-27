@@ -32,7 +32,7 @@ const DARK_HACKER_THEME = {
 // Visual effects settings (for accessibility)
 const DEFAULT_EFFECTS = {
   scanlines: true,
-  glitch: true,
+  glitch: false,
   crt: true,
 };
 

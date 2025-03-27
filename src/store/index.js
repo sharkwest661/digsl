@@ -30,7 +30,7 @@ const useAppStore = create((set) => ({
   // Music player state (keeping these here since they're referenced in multiple components)
   isPlaying: false,
   currentTrack: 0,
-  volume: 50,
+  volume: 30,
 
   // Actions
 
