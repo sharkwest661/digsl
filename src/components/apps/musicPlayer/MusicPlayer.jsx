@@ -9,14 +9,13 @@ import {
   Volume1,
   VolumeX,
   List,
-  Grid,
   Music,
   Heart,
   HeartOff,
 } from "lucide-react";
 import { useAppStore, useThemeStore } from "../../../store";
-import { Button } from "../../ui";
 import { PLAYLIST_DATA } from "../../../constants/musicData";
+import styles from "./MusicPlayer.module.scss";
 
 const MusicPlayer = () => {
   // Get theme configuration
@@ -38,6 +37,11 @@ const MusicPlayer = () => {
   const [favorites, setFavorites] = useState([]);
   const [previousVolume, setPreviousVolume] = useState(40);
   const [visualizerData, setVisualizerData] = useState([]);
+
+  // For styling the progress input
+  const progressStyle = {
+    "--progress-percent": `${progress}%`,
+  };
 
   const audioRef = useRef(null);
   const visualizerRef = useRef(null);
@@ -199,27 +203,15 @@ const MusicPlayer = () => {
 
   // Player view
   const renderPlayerView = () => (
-    <div className="flex flex-col h-full">
+    <div className={styles.playerView}>
       {/* Visualizer */}
-      <div
-        ref={visualizerRef}
-        className="flex items-end justify-center h-48 mb-6 px-4 py-2"
-        style={{
-          backgroundColor: "rgba(0,0,0,0.2)",
-          borderRadius: "4px",
-          border: `1px solid ${themeConfig.accentSecondary}`,
-          boxShadow: `inset 0 0 10px rgba(0,0,0,0.5)`,
-          overflow: "hidden",
-        }}
-      >
+      <div ref={visualizerRef} className={styles.visualizer}>
         {visualizerData.map((bar, i) => (
           <div
             key={i}
-            className="mx-px"
+            className={styles.visualizerBar}
             style={{
               height: `${isPlaying ? bar.height : 10}%`,
-              width: "6px",
-              backgroundColor: themeConfig.accentPrimary,
               opacity: isPlaying ? bar.opacity : 0.3,
               transition: `height ${bar.animationDuration}s ease`,
               boxShadow: `0 0 5px ${themeConfig.accentPrimary}`,
@@ -229,138 +221,90 @@ const MusicPlayer = () => {
       </div>
 
       {/* Track info */}
-      <div className="px-6 mb-6 text-center">
-        <h3
-          className="text-2xl font-bold truncate"
-          style={{
-            color: themeConfig.accentPrimary,
-            textShadow: `0 0 5px ${themeConfig.accentPrimary}`,
-          }}
+      <div className={styles.trackInfo}>
+        <h3 className={styles.trackTitle}>{playlist[currentTrack].title}</h3>
+        <p className={styles.trackArtist}>{playlist[currentTrack].artist}</p>
+        <button
+          onClick={() => toggleFavorite(playlist[currentTrack].id)}
+          className={styles.favoriteButton}
         >
-          {playlist[currentTrack].title}
-        </h3>
-        <p className="text-base mb-1" style={{ color: themeConfig.textLight }}>
-          {playlist[currentTrack].artist}
-        </p>
-        <div className="flex justify-center items-center mt-2">
-          <button
-            onClick={() => toggleFavorite(playlist[currentTrack].id)}
-            className="p-1 transition-all duration-200"
-          >
-            {favorites.includes(playlist[currentTrack].id) ? (
-              <Heart
-                size={18}
-                fill={themeConfig.accentPrimary}
-                color={themeConfig.accentPrimary}
-              />
-            ) : (
-              <HeartOff size={18} color={themeConfig.textLight} />
-            )}
-          </button>
-        </div>
+          {favorites.includes(playlist[currentTrack].id) ? (
+            <Heart
+              size={18}
+              fill={themeConfig.accentPrimary}
+              color={themeConfig.accentPrimary}
+            />
+          ) : (
+            <HeartOff size={18} color={themeConfig.textLight} />
+          )}
+        </button>
       </div>
 
       {/* Progress bar */}
-      <div className="px-6 mb-6">
+      <div className={styles.progressContainer}>
         <input
           type="range"
           min="0"
           max="100"
           value={progress}
           onChange={handleProgressChange}
-          className="w-full cursor-pointer"
-          style={{
-            height: "4px",
-            background: `linear-gradient(to right, ${themeConfig.accentPrimary} 0%, ${themeConfig.accentPrimary} ${progress}%, rgba(31, 41, 55, 0.7) ${progress}%, rgba(31, 41, 55, 0.7) 100%)`,
-            borderRadius: "2px",
-            boxShadow: `0 0 5px ${themeConfig.accentPrimary}`,
-            WebkitAppearance: "none",
-          }}
+          className={styles.progressInput}
+          style={progressStyle}
         />
-        <div
-          className="flex justify-between text-xs mt-1 font-mono"
-          style={{ color: "rgba(255,255,255,0.6)" }}
-        >
+        <div className={styles.progressTimes}>
           <span>{formatTime(currentTime)}</span>
           <span>{formatTime(duration)}</span>
         </div>
       </div>
 
       {/* Controls */}
-      <div className="flex items-center justify-center space-x-8 px-6 mb-6">
-        <button
-          onClick={handlePrev}
-          className="text-white hover:text-cyan-400 transition-colors"
-        >
+      <div className={styles.controls}>
+        <button onClick={handlePrev} className={styles.controlButton}>
           <SkipBack size={24} />
         </button>
 
         <button
           onClick={handlePlay}
-          className="w-14 h-14 rounded-full flex items-center justify-center transition-all"
-          style={{
-            background: `linear-gradient(135deg, ${themeConfig.accentPrimary} 0%, ${themeConfig.accentSecondary} 100%)`,
-            boxShadow: `0 0 15px ${themeConfig.accentPrimary}`,
-            transform: isPlaying ? "scale(1.05)" : "scale(1)",
-          }}
+          className={`${styles.playButton} ${
+            isPlaying ? styles.isPlaying : ""
+          }`}
         >
           {isPlaying ? (
-            <Pause size={24} color="#000" />
+            <Pause size={24} className={styles.pauseIcon} />
           ) : (
-            <Play size={24} color="#000" className="ml-1" />
+            <Play size={24} className={styles.playIcon} />
           )}
         </button>
 
-        <button
-          onClick={handleNext}
-          className="text-white hover:text-cyan-400 transition-colors"
-        >
+        <button onClick={handleNext} className={styles.controlButton}>
           <SkipForward size={24} />
         </button>
       </div>
 
       {/* Volume slider */}
-      <div className="px-6 flex items-center gap-2 mt-8 mb-2">
-        {/* Button with pure Tailwind styling */}
-        <button
-          className="text-white hover:text-cyan-400 transition-colors p-2 rounded-full hover:bg-black hover:bg-opacity-20"
-          onClick={muteVolume}
-        >
+      <div className={styles.volumeContainer}>
+        <button className={styles.volumeButton} onClick={muteVolume}>
           {getVolumeIcon()}
         </button>
 
-        {/* Custom slider container with Tailwind */}
-        <div className="flex-1 relative h-8 flex items-center">
-          {/* Background track using Tailwind only */}
-          <div className="absolute w-full h-1 bg-gray-800 bg-opacity-50 rounded"></div>
-
-          {/* Colored progress bar using Tailwind + custom width */}
+        <div className={styles.volumeSliderContainer}>
+          <div className={styles.volumeTrack}></div>
           <div
-            className="absolute h-1 bg-cyan-400 rounded"
-            style={{
-              width: `${volume}%`,
-              boxShadow: `0 0 5px ${themeConfig.accentSecondary}`,
-            }}
+            className={styles.volumeProgress}
+            style={{ width: `${volume}%` }}
           ></div>
-
-          {/* Actual input with opacity-0 for browser compatibility */}
+          <div
+            className={styles.volumeThumb}
+            style={{ left: `calc(${volume}% - 6px)` }}
+          ></div>
           <input
             type="range"
             min="0"
             max="100"
             value={volume}
             onChange={handleVolumeChange}
-            className="absolute w-full cursor-pointer opacity-0 z-10"
+            className={styles.volumeInput}
           />
-
-          {/* Thumb indicator using Tailwind */}
-          <div
-            className="absolute w-3 h-3 rounded-full bg-cyan-400 z-0 pointer-events-none"
-            style={{
-              left: `calc(${volume}% - 6px)`,
-              boxShadow: `0 0 5px ${themeConfig.accentSecondary}`,
-            }}
-          ></div>
         </div>
       </div>
     </div>
@@ -368,87 +312,58 @@ const MusicPlayer = () => {
 
   // Playlist view
   const renderPlaylistView = () => (
-    <div className="h-full flex flex-col">
-      <div
-        className="px-4 py-3 font-mono flex items-center justify-between"
-        style={{
-          borderBottom: `1px solid ${themeConfig.accentSecondary}`,
-          backgroundColor: "rgba(0,0,0,0.2)",
-        }}
-      >
-        <h3 style={{ color: themeConfig.accentSecondary }}>TRACKS</h3>
-        <div className="text-xs" style={{ color: themeConfig.textLight }}>
-          {playlist.length} songs
-        </div>
+    <div className={styles.playlistView}>
+      <div className={styles.playlistHeader}>
+        <h3 className={styles.playlistTitle}>TRACKS</h3>
+        <div className={styles.playlistCount}>{playlist.length} songs</div>
       </div>
 
-      <div className="flex-1 overflow-y-auto custom-scrollbar">
+      <div
+        className={styles.tracksList}
+        style={{ maxHeight: "calc(100% - 80px)" }}
+      >
         {playlist.map((track, index) => (
           <div
             key={track.id}
             onClick={() => selectTrack(index)}
-            className="p-3 mb-1 mx-2 rounded cursor-pointer transition-all duration-200 flex items-center"
-            style={{
-              backgroundColor:
-                index === currentTrack
-                  ? "rgba(255,255,255,0.05)"
-                  : "transparent",
-              borderBottom: `1px solid rgba(255,255,255,0.05)`,
-              borderLeft:
-                index === currentTrack
-                  ? `2px solid ${themeConfig.accentPrimary}`
-                  : "2px solid transparent",
-            }}
+            className={`${styles.trackItem} ${
+              index === currentTrack ? styles.active : ""
+            }`}
           >
             <div
-              className="w-8 font-mono text-center mr-3"
-              style={{
-                color:
-                  index === currentTrack
-                    ? themeConfig.accentPrimary
-                    : "rgba(255,255,255,0.4)",
-              }}
+              className={`${styles.trackNumber} ${
+                index === currentTrack ? styles.active : ""
+              }`}
             >
               {isPlaying && index === currentTrack ? (
-                <div className="flex justify-center">
-                  <div className="playing-animation">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                  </div>
+                <div className={styles.playingAnimation}>
+                  <span className={styles.bar}></span>
+                  <span className={styles.bar}></span>
+                  <span className={styles.bar}></span>
                 </div>
               ) : (
                 <span>{String(index + 1).padStart(2, "0")}</span>
               )}
             </div>
 
-            <div className="flex-1 truncate">
+            <div className={styles.trackDetails}>
               <div
-                className="font-medium truncate"
-                style={{
-                  color:
-                    index === currentTrack
-                      ? themeConfig.accentPrimary
-                      : themeConfig.textLight,
-                }}
+                className={`${styles.trackItemTitle} ${
+                  index === currentTrack ? styles.active : ""
+                }`}
               >
                 {track.title}
               </div>
-              <div
-                className="text-xs truncate"
-                style={{ color: "rgba(255,255,255,0.6)" }}
-              >
-                {track.artist}
-              </div>
+              <div className={styles.trackItemArtist}>{track.artist}</div>
             </div>
 
-            <div className="flex items-center">
+            <div className={styles.trackActions}>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   toggleFavorite(track.id);
                 }}
-                className="p-2 opacity-60 hover:opacity-100 transition-opacity"
+                className={styles.trackFavorite}
               >
                 {favorites.includes(track.id) ? (
                   <Heart
@@ -461,25 +376,14 @@ const MusicPlayer = () => {
                 )}
               </button>
 
-              <div
-                className="text-xs !ml-2 font-mono"
-                style={{ color: "rgba(255,255,255,0.4)" }}
-              >
-                {track.duration}
-              </div>
+              <div className={styles.trackDuration}>{track.duration}</div>
             </div>
           </div>
         ))}
       </div>
 
-      <div
-        className="p-3 flex items-center justify-center"
-        style={{
-          borderTop: `1px solid ${themeConfig.accentSecondary}`,
-          backgroundColor: "rgba(0,0,0,0.2)",
-        }}
-      >
-        <div className="text-xs" style={{ color: themeConfig.textLight }}>
+      <div className={styles.playlistFooter}>
+        <div className={styles.playlistFooterText}>
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
       </div>
@@ -487,144 +391,37 @@ const MusicPlayer = () => {
   );
 
   return (
-    <div
-      className="w-full h-full flex flex-col relative"
-      style={{ backgroundColor: themeConfig.darkBg }}
-    >
+    <div className={styles.container}>
       {/* Audio element */}
       <audio ref={audioRef} preload="metadata" />
 
       {/* Navigation tabs */}
-      <div
-        className="flex border-b border-opacity-20"
-        style={{
-          borderColor: themeConfig.accentSecondary,
-        }}
-      >
+      <div className={styles.tabsContainer}>
         <button
-          className={`flex-1 py-3 px-4 font-mono text-sm uppercase tracking-wider transition-all duration-200 ${
-            selectedView === "player" ? "border-b-2" : ""
+          className={`${styles.tab} ${
+            selectedView === "player" ? styles.active : ""
           }`}
-          style={{
-            borderColor: themeConfig.accentPrimary,
-            color:
-              selectedView === "player"
-                ? themeConfig.accentPrimary
-                : themeConfig.textLight,
-            backgroundColor:
-              selectedView === "player" ? "rgba(0,0,0,0.2)" : "transparent",
-          }}
           onClick={() => setSelectedView("player")}
         >
-          <div className="flex items-center justify-center">
-            <Music size={16} className="mr-2" />
-            Player
-          </div>
+          <Music size={16} className={styles.tabIcon} />
+          Player
         </button>
 
         <button
-          className={`flex-1 py-3 px-4 font-mono text-sm uppercase tracking-wider transition-all duration-200 ${
-            selectedView === "playlist" ? "border-b-2" : ""
+          className={`${styles.tab} ${
+            selectedView === "playlist" ? styles.active : ""
           }`}
-          style={{
-            borderColor: themeConfig.accentPrimary,
-            color:
-              selectedView === "playlist"
-                ? themeConfig.accentPrimary
-                : themeConfig.textLight,
-            backgroundColor:
-              selectedView === "playlist" ? "rgba(0,0,0,0.2)" : "transparent",
-          }}
           onClick={() => setSelectedView("playlist")}
         >
-          <div className="flex items-center justify-center">
-            <List size={16} className="mr-2" />
-            Playlist
-          </div>
+          <List size={16} className={styles.tabIcon} />
+          Playlist
         </button>
       </div>
 
       {/* Content area */}
-      <div className="flex-1 overflow-hidden p-4">
+      <div className={styles.content}>
         {selectedView === "player" ? renderPlayerView() : renderPlaylistView()}
       </div>
-
-      {/* Animated playing indicator style */}
-      <style jsx>{`
-        .playing-animation {
-          display: flex;
-          align-items: flex-end;
-          height: 16px;
-          gap: 1px;
-        }
-
-        .playing-animation span {
-          display: block;
-          width: 2px;
-          background-color: ${themeConfig.accentPrimary};
-          animation: playing-animation 1.2s ease infinite;
-          box-shadow: 0 0 2px ${themeConfig.accentPrimary};
-        }
-
-        .playing-animation span:nth-child(1) {
-          height: 8px;
-          animation-delay: 0s;
-        }
-
-        .playing-animation span:nth-child(2) {
-          height: 16px;
-          animation-delay: 0.2s;
-        }
-
-        .playing-animation span:nth-child(3) {
-          height: 10px;
-          animation-delay: 0.4s;
-        }
-
-        @keyframes playing-animation {
-          0%,
-          100% {
-            height: 4px;
-          }
-          50% {
-            height: 12px;
-          }
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 4px;
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: rgba(0, 0, 0, 0.2);
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background: ${themeConfig.accentSecondary};
-          border-radius: 4px;
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: ${themeConfig.accentSecondary};
-          box-shadow: 0 0 5px ${themeConfig.accentSecondary};
-          cursor: pointer;
-          margin-top: -4px;
-        }
-
-        input[type="range"]::-moz-range-thumb {
-          width: 12px;
-          height: 12px;
-          border: none;
-          border-radius: 50%;
-          background: ${themeConfig.accentSecondary};
-          box-shadow: 0 0 5px ${themeConfig.accentSecondary};
-          cursor: pointer;
-        }
-      `}</style>
     </div>
   );
 };
