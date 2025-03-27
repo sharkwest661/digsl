@@ -1,0 +1,386 @@
+@import "../../styles/variables.scss";
+@import "../../styles/mixins.scss";
+
+.container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: $cyber-dark-blue;
+  color: $cyber-text-light;
+  overflow: hidden;
+}
+
+// Background elements
+.backgroundGrid {
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+      rgba($cyber-neon-pink, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba($cyber-neon-pink, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+  z-index: 1;
+  transform: perspective(500px) rotateX(60deg);
+  transform-origin: center top;
+  animation: gridMove 30s linear infinite;
+}
+
+@keyframes gridMove {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 0 60px;
+  }
+}
+
+// Dark gradient shadow at the bottom of the page
+.backgroundShadow {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 20vh;
+  background-image: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.8) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  z-index: 2;
+}
+
+.content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 1000px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3rem;
+}
+
+// Title styles
+.titleContainer {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.title {
+  font-family: $font-display;
+  font-size: 5rem;
+  font-weight: 700;
+  color: $cyber-neon-pink;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 10px $cyber-neon-pink;
+  margin-bottom: 1rem;
+  position: relative;
+
+  &.glitch {
+    animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+
+    &::before,
+    &::after {
+      content: "SHADOW MARKET";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    &::before {
+      color: $cyber-cyan;
+      z-index: -1;
+      animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) reverse both;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+      transform: translate(-2px, 0);
+    }
+
+    &::after {
+      color: $cyber-neon-pink;
+      z-index: -2;
+      animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+      clip-path: polygon(0 80%, 100% 20%, 100% 100%, 0 100%);
+      transform: translate(2px, 0);
+    }
+  }
+}
+
+.subtitle {
+  font-family: $font-mono;
+  font-size: 1.2rem;
+  color: $cyber-cyan;
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+  text-shadow: 0 0 5px $cyber-cyan;
+}
+
+// Controls section
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 2rem;
+}
+
+.startButton {
+  padding: 0.75rem 2.5rem !important;
+  font-size: 1.25rem !important;
+  letter-spacing: 0.15em !important;
+  animation: pulseGlow 2s infinite;
+  transition: all $transition-standard ease !important;
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes pulseGlow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba($cyber-neon-pink, 0.7);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba($cyber-neon-pink, 0.9);
+  }
+}
+
+.optionsContainer {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.languageSelector {
+  display: flex;
+  overflow: hidden;
+  background-color: rgba($cyber-dark-purple, 0.6);
+  border: 1px solid $cyber-cyan;
+  border-radius: 4px;
+  box-shadow: 0 0 5px rgba($cyber-cyan, 0.3);
+}
+
+.languageOption {
+  background: none;
+  border: none;
+  color: $cyber-text-light;
+  font-family: $font-mono;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all $transition-standard ease;
+  padding: 0.5rem 1rem;
+  position: relative;
+  min-width: 60px;
+  text-align: center;
+
+  &:first-child {
+    border-right: 1px solid rgba($cyber-cyan, 0.4);
+  }
+
+  &.active {
+    color: $cyber-dark-blue;
+    background-color: $cyber-cyan;
+    box-shadow: inset 0 0 10px rgba($cyber-text-light, 0.3);
+    text-shadow: none;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: $cyber-neon-pink;
+      box-shadow: 0 0 8px $cyber-neon-pink;
+    }
+  }
+
+  &:hover:not(.active) {
+    background-color: rgba($cyber-cyan, 0.2);
+  }
+}
+
+.languageDivider {
+  margin: 0 0.25rem;
+  color: rgba($cyber-text-light, 0.5);
+}
+
+// Info box
+.infoBox {
+  background-color: rgba($cyber-dark-purple, 0.6);
+  border: 1px solid $cyber-neon-pink;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 2px;
+  box-shadow: 0 0 15px rgba($cyber-neon-pink, 0.3);
+}
+
+.infoTitle {
+  font-family: $font-display;
+  font-size: 1.5rem;
+  color: $cyber-neon-pink;
+  margin-bottom: 1rem;
+  text-shadow: 0 0 5px rgba($cyber-neon-pink, 0.7);
+}
+
+.infoText {
+  font-family: $font-content;
+  font-size: 1rem;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+  color: $cyber-text-light;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Loading screen
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  margin-top: 1rem;
+  width: 500px;
+  background-color: rgba($cyber-dark-blue, 0.8);
+  border: 1px solid $cyber-neon-pink;
+  padding: 1.5rem;
+  border-radius: 2px;
+  box-shadow: 0 0 20px rgba($cyber-neon-pink, 0.3);
+}
+
+.loadingText {
+  font-family: $font-mono;
+  font-size: 1.25rem;
+  color: $cyber-neon-pink;
+  text-shadow: 0 0 5px $cyber-neon-pink;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  align-self: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.terminalOutput {
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  padding: 1rem;
+  border: 1px solid $cyber-cyan;
+  font-family: $font-mono;
+  font-size: 0.85rem;
+  color: $cyber-cyan;
+  margin-bottom: 0.5rem;
+
+  div {
+    margin-bottom: 0.5rem;
+
+    &:last-child {
+      position: relative;
+      display: inline-block;
+
+      &::after {
+        content: "";
+        position: absolute;
+        right: -12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 8px;
+        height: 16px;
+        background-color: $cyber-cyan;
+        animation: blink 1s step-end infinite;
+      }
+    }
+  }
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.loadingBarContainer {
+  width: 100%;
+  height: 12px;
+  background-color: rgba($cyber-dark-purple, 0.6);
+  border: 1px solid $cyber-cyan;
+  padding: 2px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.loadingBar {
+  height: 100%;
+  background-color: $cyber-cyan;
+  box-shadow: 0 0 10px $cyber-cyan;
+  transition: width $transition-standard ease-out;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba($cyber-cyan, 0.5),
+      transparent
+    );
+    animation: loadingBarAnimation 1.5s linear infinite;
+  }
+}
+
+@keyframes loadingBarAnimation {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.loadingMessage {
+  font-family: $font-mono;
+  font-size: 1rem;
+  color: $cyber-text-light;
+  align-self: flex-end;
+  font-weight: bold;
+}
+
+// Footer
+.footer {
+  font-family: $font-mono;
+  font-size: 0.75rem;
+  color: rgba($cyber-text-light, 0.6);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+}
+
+.separator {
+  margin: 0 0.25rem;
+}
