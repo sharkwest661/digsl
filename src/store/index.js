@@ -6,6 +6,7 @@ import {
   DARK_HACKER_THEME,
 } from "./themeStore";
 import { useWindowsStore, APP_TYPES } from "./windowsStore";
+import { useNotepadStore } from "./notepadStore";
 
 // Export all stores and constants
 export {
@@ -20,4 +21,7 @@ export {
   // Window management store and constants
   useWindowsStore,
   APP_TYPES,
+
+  // Notepad store
+  useNotepadStore,
 };
