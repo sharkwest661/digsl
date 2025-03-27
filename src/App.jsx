@@ -1,7 +1,8 @@
 import React, { useEffect } from "react";
 import Desktop from "./components/desktop/Desktop/Desktop";
 import StartPage from "./components/startPage";
-import { useAppStore } from "./store";
+import { useAppStore, useAudioStore } from "./store";
+import { PLAYLIST_DATA } from "./constants/musicData";
 import styles from "./App.module.scss";
 
 // Global styles
@@ -9,6 +10,22 @@ import "./styles/index.scss";
 
 const App = () => {
   const isInitialized = useAppStore((state) => state.isInitialized);
+  const initAudio = useAudioStore((state) => state.initAudio);
+  const setPlaylist = useAudioStore((state) => state.setPlaylist);
+
+  // Initialize audio system
+  useEffect(() => {
+    // Initialize audio element
+    initAudio();
+
+    // Set playlist data
+    setPlaylist(PLAYLIST_DATA);
+
+    // Cleanup on unmount
+    return () => {
+      useAudioStore.getState().cleanup();
+    };
+  }, [initAudio, setPlaylist]);
 
   return (
     <div className={styles.app}>

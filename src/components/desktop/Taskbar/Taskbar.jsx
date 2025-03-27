@@ -12,12 +12,23 @@ const Taskbar = () => {
   const windows = useWindowsStore((state) => state.windows);
   const activeWindowId = useWindowsStore((state) => state.activeWindowId);
   const setActiveWindow = useWindowsStore((state) => state.setActiveWindow);
+  const toggleMinimize = useWindowsStore((state) => state.toggleMinimize);
 
   // Get current time
   const time = useClock();
 
   const handleWindowClick = (windowId) => {
-    setActiveWindow(windowId);
+    const window = windows.find((w) => w.id === windowId);
+    if (window && window.isMinimized) {
+      // Restore the window if it's minimized
+      setActiveWindow(windowId);
+    } else if (window && window.id === activeWindowId) {
+      // Minimize the window if clicking the active window button
+      toggleMinimize(windowId);
+    } else {
+      // Otherwise just activate the window
+      setActiveWindow(windowId);
+    }
   };
 
   return (
@@ -33,7 +44,7 @@ const Taskbar = () => {
             key={window.id}
             className={`${styles.windowButton} ${
               window.id === activeWindowId ? styles.active : ""
-            }`}
+            } ${window.isMinimized ? styles.minimized : ""}`}
             onClick={() => handleWindowClick(window.id)}
           >
             <span className={styles.windowTitle}>{window.title}</span>

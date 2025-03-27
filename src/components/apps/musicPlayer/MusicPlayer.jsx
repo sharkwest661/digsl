@@ -1,5 +1,5 @@
 // components/apps/musicPlayer/MusicPlayer.jsx
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   Play,
   Pause,
@@ -13,41 +13,38 @@ import {
   Heart,
   HeartOff,
 } from "lucide-react";
-import { useAppStore, useThemeStore } from "../../../store";
-import { PLAYLIST_DATA } from "../../../constants/musicData";
+import { useThemeStore, useAudioStore } from "../../../store";
 import styles from "./MusicPlayer.module.scss";
 
 const MusicPlayer = () => {
   // Get theme configuration
   const themeConfig = useThemeStore((state) => state.themeConfig);
 
-  // Get music player state from app store
-  const isPlaying = useAppStore((state) => state.isPlaying);
-  const setIsPlaying = useAppStore((state) => state.setIsPlaying);
-  const currentTrack = useAppStore((state) => state.currentTrack);
-  const setCurrentTrack = useAppStore((state) => state.setCurrentTrack);
-  const volume = useAppStore((state) => state.volume);
-  const setVolume = useAppStore((state) => state.setVolume);
+  // Get music player state from audio store
+  const isPlaying = useAudioStore((state) => state.isPlaying);
+  const togglePlay = useAudioStore((state) => state.togglePlay);
+  const currentTrackIndex = useAudioStore((state) => state.currentTrackIndex);
+  const changeTrack = useAudioStore((state) => state.changeTrack);
+  const volume = useAudioStore((state) => state.volume);
+  const setVolume = useAudioStore((state) => state.setVolume);
+  const duration = useAudioStore((state) => state.duration);
+  const currentTime = useAudioStore((state) => state.currentTime);
+  const seekTo = useAudioStore((state) => state.seekTo);
+  const playlist = useAudioStore((state) => state.playlist);
 
   // Local state
   const [progress, setProgress] = useState(0);
-  const [duration, setDuration] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
   const [selectedView, setSelectedView] = useState("player"); // 'player' or 'playlist'
   const [favorites, setFavorites] = useState([]);
   const [previousVolume, setPreviousVolume] = useState(40);
   const [visualizerData, setVisualizerData] = useState([]);
 
+  const visualizerRef = useRef(null);
+
   // For styling the progress input
   const progressStyle = {
     "--progress-percent": `${progress}%`,
   };
-
-  const audioRef = useRef(null);
-  const visualizerRef = useRef(null);
-
-  // Mock playlist data with actual file paths
-  const playlist = PLAYLIST_DATA;
 
   // Initialize visualizer
   useEffect(() => {
@@ -76,84 +73,29 @@ const MusicPlayer = () => {
     return () => clearInterval(intervalId);
   }, [isPlaying]);
 
-  // Set up audio event listeners
+  // Update progress when currentTime or duration changes
   useEffect(() => {
-    const audio = audioRef.current;
-
-    const handleTimeUpdate = () => {
-      setCurrentTime(audio.currentTime || 0);
-      // Ensure we don't divide by NaN or 0
-      const calculatedProgress = !audio.duration
-        ? 0
-        : (audio.currentTime / audio.duration) * 100;
+    if (duration > 0) {
+      const calculatedProgress = (currentTime / duration) * 100;
       setProgress(isNaN(calculatedProgress) ? 0 : calculatedProgress);
-    };
-
-    const handleDurationChange = () => {
-      setDuration(audio.duration || 0);
-    };
-
-    const handleEnded = () => {
-      handleNext();
-    };
-
-    audio.addEventListener("timeupdate", handleTimeUpdate);
-    audio.addEventListener("durationchange", handleDurationChange);
-    audio.addEventListener("ended", handleEnded);
-
-    // Set initial volume
-    audio.volume = volume / 100;
-
-    return () => {
-      audio.removeEventListener("timeupdate", handleTimeUpdate);
-      audio.removeEventListener("durationchange", handleDurationChange);
-      audio.removeEventListener("ended", handleEnded);
-    };
-  }, [currentTrack]);
-
-  // Handle play state changes
-  useEffect(() => {
-    if (isPlaying) {
-      audioRef.current
-        .play()
-        .catch((e) => console.error("Error playing audio:", e));
     } else {
-      audioRef.current.pause();
+      setProgress(0);
     }
-  }, [isPlaying]);
-
-  // Handle track changes
-  useEffect(() => {
-    const wasPlaying = isPlaying;
-    audioRef.current.src = playlist[currentTrack].file;
-    audioRef.current.load();
-
-    if (wasPlaying) {
-      audioRef.current
-        .play()
-        .catch((e) => console.error("Error playing audio:", e));
-    }
-  }, [currentTrack]);
-
-  // Handle volume changes
-  useEffect(() => {
-    audioRef.current.volume = volume / 100;
-  }, [volume]);
+  }, [currentTime, duration]);
 
   const handlePlay = () => {
-    setIsPlaying(!isPlaying);
+    togglePlay();
   };
 
   const handleNext = () => {
-    setCurrentTrack(
-      currentTrack === playlist.length - 1 ? 0 : currentTrack + 1
-    );
+    const nextIndex = (currentTrackIndex + 1) % playlist.length;
+    changeTrack(nextIndex);
   };
 
   const handlePrev = () => {
-    setCurrentTrack(
-      currentTrack === 0 ? playlist.length - 1 : currentTrack - 1
-    );
+    const prevIndex =
+      currentTrackIndex === 0 ? playlist.length - 1 : currentTrackIndex - 1;
+    changeTrack(prevIndex);
   };
 
   const handleVolumeChange = (e) => {
@@ -163,12 +105,12 @@ const MusicPlayer = () => {
   const handleProgressChange = (e) => {
     const newProgress = parseFloat(e.target.value);
     setProgress(newProgress);
-    audioRef.current.currentTime = (newProgress / 100) * duration;
+    const newTime = (newProgress / 100) * duration;
+    seekTo(newTime);
   };
 
   const selectTrack = (index) => {
-    setCurrentTrack(index);
-    setIsPlaying(true);
+    changeTrack(index);
   };
 
   // Format time in minutes:seconds
@@ -205,6 +147,11 @@ const MusicPlayer = () => {
     }
   };
 
+  // Current track information
+  const currentTrack = useMemo(() => {
+    return playlist.length > 0 ? playlist[currentTrackIndex] : null;
+  }, [playlist, currentTrackIndex]);
+
   // Player view
   const renderPlayerView = () => (
     <div className={styles.playerView}>
@@ -226,22 +173,26 @@ const MusicPlayer = () => {
 
       {/* Track info */}
       <div className={styles.trackInfo}>
-        <h3 className={styles.trackTitle}>{playlist[currentTrack].title}</h3>
-        <p className={styles.trackArtist}>{playlist[currentTrack].artist}</p>
-        <button
-          onClick={() => toggleFavorite(playlist[currentTrack].id)}
-          className={styles.favoriteButton}
-        >
-          {favorites.includes(playlist[currentTrack].id) ? (
-            <Heart
-              size={18}
-              fill={themeConfig.accentPrimary}
-              color={themeConfig.accentPrimary}
-            />
-          ) : (
-            <HeartOff size={18} color={themeConfig.textLight} />
-          )}
-        </button>
+        <h3 className={styles.trackTitle}>
+          {currentTrack?.title || "No Track"}
+        </h3>
+        <p className={styles.trackArtist}>{currentTrack?.artist || ""}</p>
+        {currentTrack && (
+          <button
+            onClick={() => toggleFavorite(currentTrack.id)}
+            className={styles.favoriteButton}
+          >
+            {favorites.includes(currentTrack.id) ? (
+              <Heart
+                size={18}
+                fill={themeConfig.accentPrimary}
+                color={themeConfig.accentPrimary}
+              />
+            ) : (
+              <HeartOff size={18} color={themeConfig.textLight} />
+            )}
+          </button>
+        )}
       </div>
 
       {/* Progress bar */}
@@ -331,15 +282,15 @@ const MusicPlayer = () => {
             key={track.id}
             onClick={() => selectTrack(index)}
             className={`${styles.trackItem} ${
-              index === currentTrack ? styles.active : ""
+              index === currentTrackIndex ? styles.active : ""
             }`}
           >
             <div
               className={`${styles.trackNumber} ${
-                index === currentTrack ? styles.active : ""
+                index === currentTrackIndex ? styles.active : ""
               }`}
             >
-              {isPlaying && index === currentTrack ? (
+              {isPlaying && index === currentTrackIndex ? (
                 <div className={styles.playingAnimation}>
                   <span className={styles.bar}></span>
                   <span className={styles.bar}></span>
@@ -353,7 +304,7 @@ const MusicPlayer = () => {
             <div className={styles.trackDetails}>
               <div
                 className={`${styles.trackItemTitle} ${
-                  index === currentTrack ? styles.active : ""
+                  index === currentTrackIndex ? styles.active : ""
                 }`}
               >
                 {track.title}
@@ -396,9 +347,6 @@ const MusicPlayer = () => {
 
   return (
     <div className={styles.container}>
-      {/* Audio element */}
-      <audio ref={audioRef} preload="metadata" />
-
       {/* Navigation tabs */}
       <div className={styles.tabsContainer}>
         <button

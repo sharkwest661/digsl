@@ -91,6 +91,7 @@ const Desktop = () => {
   const closeWindow = useWindowsStore((state) => state.closeWindow);
   const setActiveWindow = useWindowsStore((state) => state.setActiveWindow);
   const openWindow = useWindowsStore((state) => state.openWindow);
+  const toggleMinimize = useWindowsStore((state) => state.toggleMinimize);
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
 
   // Local state
@@ -190,8 +191,10 @@ const Desktop = () => {
               title={window.title}
               initialPosition={window.position}
               isActive={window.id === activeWindowId}
+              isMinimized={window.isMinimized}
               zIndex={window.zIndex}
               onClose={closeWindow}
+              onMinimize={toggleMinimize}
               resizable={false}
               onFocus={setActiveWindow}
               darkHackerTheme={window.appType === APP_TYPES.DARK_WEB}
