@@ -1,6 +1,11 @@
 // components/apps/notepad/Notepad.jsx
-// Used by the Desktop component - referenced in APP_COMPONENTS
-import React, { useState, useEffect, useRef } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useMemo,
+  useCallback,
+} from "react";
 import {
   Search,
   Save,
@@ -11,7 +16,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { useNotepadStore, useThemeStore } from "../../../store";
+import { useThemeStore, useNotepadStore } from "../../../store";
 import { formatDate } from "../../../utils/formatters";
 import styles from "./Notepad.module.scss";
 
@@ -19,27 +24,18 @@ const Notepad = () => {
   // Get theme configuration
   const themeConfig = useThemeStore((state) => state.themeConfig);
 
-  // Get notepad state from the store
-  const {
-    notes,
-    activeNoteId,
-    createNote,
-    updateNote,
-    deleteNote,
-    setActiveNote,
-  } = useNotepadStore((state) => ({
-    notes: state.notes,
-    activeNoteId: state.activeNoteId,
-    createNote: state.createNote,
-    updateNote: state.updateNote,
-    deleteNote: state.deleteNote,
-    setActiveNote: state.setActiveNote,
-  }));
+  // Selectively pick state and actions to prevent unnecessary re-renders
+  const notes = useNotepadStore((state) => state.notes);
+  const activeNoteId = useNotepadStore((state) => state.activeNoteId);
+  const createNote = useNotepadStore((state) => state.createNote);
+  const updateNote = useNotepadStore((state) => state.updateNote);
+  const deleteNote = useNotepadStore((state) => state.deleteNote);
+  const setActiveNote = useNotepadStore((state) => state.setActiveNote);
 
   // Local state
   const [showSidebar, setShowSidebar] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredNotes, setFilteredNotes] = useState(notes);
+  const [filteredNotes, setFilteredNotes] = useState([]);
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const [isEditing, setIsEditing] = useState(false);
@@ -48,9 +44,13 @@ const Notepad = () => {
 
   const textAreaRef = useRef(null);
   const titleInputRef = useRef(null);
+  const saveTimeoutRef = useRef(null);
 
-  // Find active note
-  const activeNote = notes.find((note) => note.id === activeNoteId) || null;
+  // Find active note - memoized to prevent unnecessary recalculations
+  const activeNote = useMemo(
+    () => notes.find((note) => note.id === activeNoteId) || null,
+    [notes, activeNoteId]
+  );
 
   // Filter notes based on search query
   useEffect(() => {
@@ -88,129 +88,169 @@ const Notepad = () => {
     }
   }, [isEditing]);
 
+  // Cleanup timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+    };
+  }, []);
+
   // Update word and character counts
-  const updateCounts = (text) => {
+  const updateCounts = useCallback((text) => {
     setCharCount(text.length);
     setWordCount(text.trim() === "" ? 0 : text.trim().split(/\s+/).length);
-  };
+  }, []);
 
-  // Handle content changes
-  const handleContentChange = (e) => {
-    const newContent = e.target.value;
-    setContent(newContent);
-    updateCounts(newContent);
+  // Handle content changes with debouncing
+  const handleContentChange = useCallback(
+    (e) => {
+      const newContent = e.target.value;
+      setContent(newContent);
+      updateCounts(newContent);
 
-    // Auto-save after typing stops (debounce)
-    if (activeNote) {
-      saveChanges(activeNote.id, title, newContent);
-    }
-  };
+      // Debounce the auto-save
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+
+      if (activeNote) {
+        saveTimeoutRef.current = setTimeout(() => {
+          saveChanges(activeNote.id, title, newContent);
+          saveTimeoutRef.current = null;
+        }, 1000); // 1 second debounce
+      }
+    },
+    [activeNote, title, updateCounts]
+  );
 
   // Handle title changes
-  const handleTitleChange = (e) => {
+  const handleTitleChange = useCallback((e) => {
     setTitle(e.target.value);
-  };
+  }, []);
 
-  // Save changes to a note
-  const saveChanges = (id, noteTitle, noteContent) => {
-    updateNote(id, {
-      title: noteTitle,
-      content: noteContent,
-      lastModified: new Date(),
-    });
-  };
+  // Save changes to a note - only save if content actually changed
+  const saveChanges = useCallback(
+    (id, noteTitle, noteContent) => {
+      const currentNote = notes.find((note) => note.id === id);
+      if (
+        currentNote &&
+        (currentNote.title !== noteTitle || currentNote.content !== noteContent)
+      ) {
+        updateNote(id, {
+          title: noteTitle,
+          content: noteContent,
+          lastModified: new Date(),
+        });
+      }
+    },
+    [notes, updateNote]
+  );
 
   // Create a new note
-  const handleCreateNote = () => {
+  const handleCreateNote = useCallback(() => {
     const newNote = createNote();
     setActiveNote(newNote.id);
     setIsEditing(true);
-  };
+  }, [createNote, setActiveNote]);
 
   // Delete the active note
-  const handleDeleteNote = () => {
+  const handleDeleteNote = useCallback(() => {
     if (
       activeNote &&
       window.confirm("Are you sure you want to delete this note?")
     ) {
       deleteNote(activeNote.id);
     }
-  };
+  }, [activeNote, deleteNote]);
 
   // Toggle title editing mode
-  const toggleEditing = () => {
+  const toggleEditing = useCallback(() => {
     if (isEditing && activeNote) {
-      // Save the title when exiting edit mode
-      saveChanges(activeNote.id, title, content);
+      // Save the title when exiting edit mode, only if it changed
+      if (activeNote.title !== title || activeNote.content !== content) {
+        saveChanges(activeNote.id, title, content);
+      }
     }
     setIsEditing(!isEditing);
-  };
+  }, [isEditing, activeNote, title, content, saveChanges]);
 
   // Handle search input
-  const handleSearchChange = (e) => {
+  const handleSearchChange = useCallback((e) => {
     setSearchQuery(e.target.value);
-  };
+  }, []);
 
   // Toggle sidebar visibility
-  const toggleSidebar = () => {
+  const toggleSidebar = useCallback(() => {
     setShowSidebar(!showSidebar);
-  };
+  }, [showSidebar]);
 
   return (
     <div className={styles.container}>
       {/* Sidebar with notes list */}
-      <div className={`${styles.sidebar} ${!showSidebar ? styles.hidden : ""}`}>
-        <div className={styles.sidebarHeader}>
-          <h3 className={styles.sidebarTitle}>NOTES</h3>
-          <div className={styles.searchContainer}>
-            <input
-              type="text"
-              placeholder="Search notes..."
-              value={searchQuery}
-              onChange={handleSearchChange}
-              className={styles.searchInput}
-            />
-            <Search size={16} className={styles.searchIcon} />
+      {showSidebar && (
+        <div className={styles.sidebar}>
+          <div className={styles.sidebarHeader}>
+            <h3 className={styles.sidebarTitle}>NOTES</h3>
+            <div className={styles.searchContainer}>
+              <input
+                type="text"
+                placeholder="Search notes..."
+                value={searchQuery}
+                onChange={handleSearchChange}
+                className={styles.searchInput}
+              />
+              <Search size={16} className={styles.searchIcon} />
+            </div>
+          </div>
+
+          <div className={styles.notesList}>
+            {filteredNotes.length === 0 ? (
+              <div className={styles.emptyMessage}>No notes found</div>
+            ) : (
+              filteredNotes.map((note) => (
+                <div
+                  key={note.id}
+                  onClick={() => setActiveNote(note.id)}
+                  className={`${styles.noteItem} ${
+                    note.id === activeNoteId ? styles.active : ""
+                  }`}
+                >
+                  <div className={styles.noteTitle}>
+                    {note.title || "Untitled Note"}
+                  </div>
+                  <div className={styles.noteDate}>
+                    {formatDate(note.lastModified)}
+                  </div>
+                  <div className={styles.notePreview}>
+                    {note.content.substring(0, 60)}
+                    {note.content.length > 60 ? "..." : ""}
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+
+          <div className={styles.sidebarFooter}>
+            <button
+              onClick={handleCreateNote}
+              className={styles.newNoteButton}
+              style={{ height: "36px" }}
+            >
+              <Plus size={16} />
+              New Note
+            </button>
           </div>
         </div>
-
-        <div className={styles.notesList}>
-          {filteredNotes.length === 0 ? (
-            <div className={styles.emptyMessage}>No notes found</div>
-          ) : (
-            filteredNotes.map((note) => (
-              <div
-                key={note.id}
-                onClick={() => setActiveNote(note.id)}
-                className={`${styles.noteItem} ${
-                  note.id === activeNoteId ? styles.active : ""
-                }`}
-              >
-                <div className={styles.noteTitle}>
-                  {note.title || "Untitled Note"}
-                </div>
-                <div className={styles.noteDate}>
-                  {formatDate(note.lastModified)}
-                </div>
-                <div className={styles.notePreview}>
-                  {note.content.substring(0, 60)}
-                  {note.content.length > 60 ? "..." : ""}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-
-        <div className={styles.sidebarFooter}>
-          <button onClick={handleCreateNote} className={styles.newNoteButton}>
-            <Plus size={16} />
-            New Note
-          </button>
-        </div>
-      </div>
+      )}
 
       {/* Main content area */}
-      <div className={styles.contentArea}>
+      <div
+        className={`${styles.contentArea} ${
+          !showSidebar ? styles.fullWidth : ""
+        }`}
+      >
         {/* Main toolbar */}
         <div className={styles.toolbar}>
           <button
