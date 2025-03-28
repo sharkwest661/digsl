@@ -36,6 +36,9 @@ const AppPlaceholder = ({ appType }) => (
   </div>
 );
 
+// Import Database component
+import DatabaseSearch from "../../apps/database";
+
 // Map of app types to components
 const APP_COMPONENTS = {
   [APP_TYPES.MUSIC_PLAYER]: MusicPlayer,
@@ -43,6 +46,7 @@ const APP_COMPONENTS = {
   [APP_TYPES.HACKING_TOOL]: TerminalApp,
   [APP_TYPES.DARK_WEB]: DarkWebBrowser,
   [APP_TYPES.EVIDENCE_BOARD]: EvidenceBoard,
+  [APP_TYPES.DATABASE]: DatabaseSearch,
   // Other app types will be filled in later
 };
 

@@ -5,14 +5,15 @@
   "english": "English",
   "azerbaijani": "Azerbaijani",
   "theme": "Theme",
-  "tagline": "Uncover the truth in early 2000s Azerbaijan",
+  "tagline": "Solve a series of murders in 2003 Azerbaijan",
   "gameDescription": "Welcome to Digital Sleuth",
-  "gameDescriptionText1": "Navigate a simulated OS interface to solve a complex mystery set in a cyberpunk version of early 2000s Azerbaijan.",
-  "gameDescriptionText2": "Search databases, analyze evidence, connect clues, and discover the truth hidden within the digital landscape.",
+  "gameDescriptionText1": "Navigate a simulated OS interface to investigate a serial killer operating through the digital underworld of 2003 Azerbaijan.",
+  "gameDescriptionText2": "Search databases, analyze digital evidence, track online activity, and uncover connections between victims to find the killer.",
   "gameStarted": "Game Loading...",
   "gameStartedMessage": "The OS is initializing. Please wait...",
   "musicPlayer": "Music Player",
   "showPlaylist": "SHOW PLAYLIST",
   "hidePlaylist": "HIDE PLAYLIST",
-  "switchTheme": "SWITCH THEME"
+  "switchTheme": "SWITCH THEME",
+  "percentComplete": "%"
 }

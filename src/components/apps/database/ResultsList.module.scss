@@ -1,0 +1,144 @@
+@import "../../../styles/variables.scss";
+@import "../../../styles/mixins.scss";
+
+.resultsContainer {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.resultsHeader {
+  padding: 10px 15px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-bottom: 1px solid rgba($hacker-green, 0.3);
+}
+
+.resultsCount {
+  font-size: 12px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+  color: $hacker-green;
+}
+
+.resultsList {
+  flex: 1;
+  overflow-y: auto;
+  padding: 5px;
+
+  @include custom-scrollbar(rgba(0, 0, 0, 0.2), rgba($hacker-green, 0.5));
+}
+
+.resultItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba($hacker-green, 0.3);
+  cursor: pointer;
+  transition: all $transition-standard ease;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+    border-color: rgba($hacker-green, 0.5);
+  }
+
+  &.selected {
+    background-color: rgba($hacker-green, 0.15);
+    border-color: $hacker-green;
+    box-shadow: 0 0 8px rgba($hacker-green, 0.3);
+
+    .resultTitle {
+      color: $hacker-green;
+      text-shadow: 0 0 3px rgba($hacker-green, 0.5);
+    }
+
+    .viewIcon {
+      opacity: 1;
+    }
+  }
+}
+
+.resultIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba($hacker-green, 0.5);
+  border-radius: 4px;
+  color: $hacker-green;
+  flex-shrink: 0;
+}
+
+.resultInfo {
+  flex: 1;
+  min-width: 0; // Important for text overflow
+}
+
+.resultTitle {
+  font-size: 14px;
+  font-weight: bold;
+  color: rgba($hacker-green, 0.9);
+  margin-bottom: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.resultMeta {
+  font-size: 11px;
+  color: rgba($hacker-green, 0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.viewIcon {
+  color: $hacker-green;
+  opacity: 0.5;
+  flex-shrink: 0;
+  transition: opacity $transition-standard ease;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.spinner {
+  color: $hacker-green;
+  margin-bottom: 15px;
+  animation: spin 1.5s linear infinite;
+}
+
+.loadingText {
+  font-size: 14px;
+  color: $hacker-green;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
