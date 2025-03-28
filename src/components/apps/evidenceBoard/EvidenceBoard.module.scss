@@ -1,0 +1,144 @@
+// components/apps/evidenceBoard/EvidenceBoard.module.scss
+@import "../../../styles/variables.scss";
+@import "../../../styles/mixins.scss";
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: $cyber-dark-purple;
+  overflow: hidden;
+  position: relative;
+}
+
+.controls {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: $cyber-dark-blue;
+  border-bottom: 1px solid $cyber-neon-pink;
+}
+
+.controlsLeft,
+.controlsRight {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controlButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background-color: rgba($cyber-dark-purple, 0.7);
+  border: 1px solid $cyber-neon-pink;
+  border-radius: 2px;
+  color: $cyber-neon-pink;
+  cursor: pointer;
+  transition: all $transition-standard ease;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($cyber-dark-purple, 0.9);
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &.active {
+    background-color: rgba($cyber-neon-pink, 0.2);
+    box-shadow: inset 0 0 8px rgba($cyber-neon-pink, 0.5);
+  }
+}
+
+.zoomIndicator {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $cyber-cyan;
+  margin-left: 6px;
+}
+
+.board {
+  flex: 1;
+  overflow: hidden;
+  position: relative;
+  background-color: rgba($cyber-dark-blue, 0.8);
+  background-image: linear-gradient(
+      rgba($cyber-neon-pink, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba($cyber-neon-pink, 0.05) 1px, transparent 1px);
+  background-size: 30px 30px;
+
+  &.dragging {
+    cursor: grabbing;
+  }
+
+  &.connecting {
+    cursor: crosshair;
+  }
+}
+
+.boardContent {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  transform-origin: 0 0;
+  will-change: transform; // Performance optimization
+  transition: transform 0.1s ease;
+}
+
+.connectionModeIndicator {
+  position: absolute;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba($cyber-dark-blue, 0.9);
+  border: 1px solid $cyber-neon-pink;
+  padding: 8px 16px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  color: $cyber-neon-pink;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 14px;
+  animation: fadeIn 0.3s ease;
+  box-shadow: 0 0 10px rgba($cyber-neon-pink, 0.5);
+}
+
+.cancelButton {
+  background: none;
+  border: none;
+  color: $cyber-neon-pink;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  margin-left: 8px;
+
+  &:hover {
+    color: $cyber-warning-red;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 10px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

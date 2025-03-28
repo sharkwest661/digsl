@@ -24,6 +24,7 @@ import Notepad from "../../apps/notepad/Notepad";
 import TerminalApp from "../../apps/terminal";
 import Taskbar from "../Taskbar";
 import DarkWebBrowser from "../../apps/darkWeb";
+import EvidenceBoard from "../../apps/evidenceBoard";
 import styles from "./Desktop.module.scss";
 
 // Import app components - these will be loaded dynamically based on window type
@@ -39,8 +40,9 @@ const AppPlaceholder = ({ appType }) => (
 const APP_COMPONENTS = {
   [APP_TYPES.MUSIC_PLAYER]: MusicPlayer,
   [APP_TYPES.NOTEPAD]: Notepad,
-  [APP_TYPES.HACKING_TOOL]: TerminalApp, // Add this line
+  [APP_TYPES.HACKING_TOOL]: TerminalApp,
   [APP_TYPES.DARK_WEB]: DarkWebBrowser,
+  [APP_TYPES.EVIDENCE_BOARD]: EvidenceBoard,
   // Other app types will be filled in later
 };
 
