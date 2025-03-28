@@ -8,6 +8,7 @@ import {
 import { useWindowsStore, APP_TYPES } from "./windowsStore";
 import { useNotepadStore } from "./notepadStore";
 import { useAudioStore } from "./audioStore";
+import { useDarkWebStore } from "./darkWebStore";
 
 // Export all stores and constants
 export {
@@ -28,4 +29,7 @@ export {
 
   // Audio store
   useAudioStore,
+
+  // Dark Web store
+  useDarkWebStore,
 };

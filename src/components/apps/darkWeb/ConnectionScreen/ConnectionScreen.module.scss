@@ -1,0 +1,180 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/mixins.scss";
+
+.container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 20px;
+}
+
+.connectionBox {
+  width: 500px;
+  padding: 30px;
+  background-color: rgba($hacker-panel, 0.7);
+  border: 1px solid $hacker-green;
+  border-radius: 2px;
+  box-shadow: 0 0 15px rgba($hacker-green, 0.3);
+  text-align: center;
+}
+
+.iconContainer {
+  margin-bottom: 20px;
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.shieldIcon {
+  color: $hacker-green;
+}
+
+.shieldAnimated {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid $hacker-green;
+    border-radius: 50%;
+    animation: shieldPulse 2s infinite;
+  }
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border: 1px solid rgba($hacker-green, 0.4);
+    border-radius: 50%;
+    animation: shieldPulse 2s infinite 0.5s;
+  }
+}
+
+.shieldSuccess {
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: -5px;
+    left: -5px;
+    right: -5px;
+    bottom: -5px;
+    border: 2px solid $hacker-green;
+    border-radius: 50%;
+    box-shadow: 0 0 15px $hacker-green;
+  }
+}
+
+.title {
+  font-family: $font-mono;
+  font-size: 20px;
+  font-weight: bold;
+  color: $hacker-green;
+  text-shadow: 0 0 5px rgba($hacker-green, 0.7);
+  margin-bottom: 20px;
+  letter-spacing: 1px;
+}
+
+.progressBar {
+  height: 5px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border-radius: 2px;
+  margin-bottom: 15px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background-color: $hacker-green;
+  box-shadow: 0 0 5px $hacker-green;
+  transition: width 0.8s ease-in-out;
+}
+
+.currentStage {
+  font-family: $font-mono;
+  font-size: 16px;
+  color: $hacker-green;
+  margin-bottom: 20px;
+  height: 20px;
+}
+
+.logContainer {
+  text-align: left;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba($hacker-green, 0.4);
+  padding: 15px;
+  margin-bottom: 20px;
+  max-height: 200px;
+  overflow-y: auto;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.8);
+
+  @include custom-scrollbar(rgba(0, 0, 0, 0.5), rgba($hacker-green, 0.5));
+}
+
+.logEntry {
+  margin-bottom: 6px;
+  line-height: 1.4;
+
+  &.active {
+    color: $hacker-green;
+    font-weight: bold;
+    text-shadow: 0 0 2px rgba($hacker-green, 0.7);
+  }
+}
+
+.warningBox {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  background-color: rgba($hacker-red, 0.1);
+  border: 1px solid $hacker-red;
+  margin-top: 20px;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.warningIcon {
+  color: $hacker-red;
+  margin-right: 10px;
+  flex-shrink: 0;
+}
+
+.warningText {
+  color: $hacker-red;
+  font-size: 12px;
+  text-align: left;
+  font-family: $font-mono;
+}
+
+@keyframes shieldPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

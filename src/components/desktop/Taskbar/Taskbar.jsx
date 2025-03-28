@@ -19,15 +19,23 @@ const Taskbar = () => {
 
   const handleWindowClick = (windowId) => {
     const window = windows.find((w) => w.id === windowId);
-    if (window && window.isMinimized) {
-      // Restore the window if it's minimized
-      setActiveWindow(windowId);
-    } else if (window && window.id === activeWindowId) {
-      // Minimize the window if clicking the active window button
-      toggleMinimize(windowId);
-    } else {
-      // Otherwise just activate the window
-      setActiveWindow(windowId);
+
+    if (window) {
+      if (window.isMinimized) {
+        // First restore the window if it's minimized
+        toggleMinimize(windowId);
+
+        // Then set it as active after a small delay to ensure state is updated
+        setTimeout(() => {
+          setActiveWindow(windowId);
+        }, 10);
+      } else if (window.id === activeWindowId) {
+        // Minimize the window if clicking the active window button
+        toggleMinimize(windowId);
+      } else {
+        // Otherwise just activate the window
+        setActiveWindow(windowId);
+      }
     }
   };
 

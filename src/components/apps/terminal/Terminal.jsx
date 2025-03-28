@@ -1,6 +1,6 @@
 // src/components/apps/terminal/Terminal.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useThemeStore } from "../../../store";
+import { useThemeStore, useDarkWebStore } from "../../../store";
 import styles from "./Terminal.module.scss";
 
 const Terminal = () => {
@@ -206,6 +206,9 @@ const Terminal = () => {
         "Need to check system access for each vendor.",
         "Product IDs found at crime scenes match listings.",
         "Possible passwords may relate to vendor descriptions or products.",
+        "",
+        "Informant mentioned Shadow Market can be accessed at shadow.market.onion",
+        "Need to verify this address in the dark web browser.",
       ];
     } else if (file === "vendors.txt" && currentDir.includes("documents")) {
       content = [
@@ -373,7 +376,10 @@ const Terminal = () => {
       setIsCracked(true);
 
       // Handle successful crack based on target
+      let vendorId = null;
+
       if (targetSystem.includes("cobra")) {
+        vendorId = "CobraSystems";
         addOutput([
           "=== VENDOR PROFILE: CobraSystems ===",
           "Real name: Alex Karimov",
@@ -385,6 +391,7 @@ const Terminal = () => {
           "=====================================",
         ]);
       } else if (targetSystem.includes("ghost")) {
+        vendorId = "GhostDoc";
         addOutput([
           "=== VENDOR PROFILE: GhostDoc ===",
           "Real name: Dr. Leyla Mahmudova",
@@ -396,6 +403,7 @@ const Terminal = () => {
           "=====================================",
         ]);
       } else if (targetSystem.includes("prometheus")) {
+        vendorId = "Prometheus_X";
         addOutput([
           "=== VENDOR PROFILE: Prometheus_X ===",
           "Real name: Ibrahim Nasirov",
@@ -407,36 +415,29 @@ const Terminal = () => {
           "=====================================",
         ]);
       }
-      return;
-    }
 
-    // Generate feedback on the password attempt
-    let feedbackMsg = "";
-    let correctChars = 0;
-    let correctPositions = 0;
+      // If vendorId was identified, update the dark web store to unlock vendor
+      if (vendorId) {
+        try {
+          // Use the dark web store to unlock the vendor
+          const darkWebStore = useDarkWebStore.getState();
 
-    for (let i = 0; i < guess.length; i++) {
-      if (i < password.length && guess[i] === password[i]) {
-        correctPositions++;
-      } else if (password.includes(guess[i])) {
-        correctChars++;
+          // First update the vendor's access status
+          darkWebStore.authenticateAsVendor(vendorId);
+
+          addOutput([
+            `Vendor profile for ${vendorId} has been unlocked in the Shadow Market browser.`,
+            "You can now access their complete vendor profile and transaction history.",
+            "Use 'connect " +
+              targetSystem +
+              "' to access the account directly.",
+          ]);
+        } catch (error) {
+          console.error("Error updating dark web store:", error);
+        }
       }
-    }
 
-    feedbackMsg = `Analysis: ${correctPositions} characters in correct position, ${correctChars} correct characters in wrong position.`;
-    setFeedback(feedbackMsg);
-    addOutput([feedbackMsg]);
-
-    // Check if max attempts reached
-    if (attempts + 1 >= maxAttempts) {
-      addOutput([
-        "MAXIMUM ATTEMPTS REACHED",
-        "System has locked you out.",
-        "Crack attempt failed.",
-      ]);
-      setCrackingMode(false);
-    } else {
-      addOutput(["Enter next guess:"]);
+      return;
     }
   };
 

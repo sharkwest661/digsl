@@ -14,9 +14,17 @@ const APP_TYPES = {
   HACKING_TOOL: "hackingTool",
 };
 
+// Theme associations for each app
+const APP_THEMES = {
+  [APP_TYPES.DARK_WEB]: "darkHacker",
+  [APP_TYPES.HACKING_TOOL]: "darkHacker",
+  [APP_TYPES.DATABASE]: "darkHacker", // Assuming we want database to use hacker theme
+  // All other apps will use default cyberpunk theme if not specified
+};
+
 // Default positions for initial window placement
 const DEFAULT_POSITIONS = {
-  [APP_TYPES.DARK_WEB]: { x: 50, y: 50, width: 800, height: 600 },
+  [APP_TYPES.DARK_WEB]: { x: 50, y: 50, width: 1200, height: 650 },
   [APP_TYPES.SEARCH_ENGINE]: { x: 80, y: 80, width: 700, height: 500 },
   [APP_TYPES.DATABASE]: { x: 100, y: 100, width: 750, height: 550 },
   [APP_TYPES.EVIDENCE_BOARD]: { x: 120, y: 120, width: 900, height: 650 },
@@ -37,6 +45,12 @@ const useWindowsStore = create((set, get) => ({
 
   // Counter for generating unique window IDs
   windowIdCounter: 0,
+
+  // Get theme for a specific app type
+  getAppTheme: (appType) => APP_THEMES[appType] || "cyberpunk",
+
+  // Check if an app should use dark hacker theme
+  shouldUseDarkHackerTheme: (appType) => APP_THEMES[appType] === "darkHacker",
 
   // Open a new window
   openWindow: (appType, title, props = {}) => {
@@ -124,27 +138,31 @@ const useWindowsStore = create((set, get) => ({
   // Set a window as active (bring to front)
   setActiveWindow: (windowId) => {
     set((state) => {
-      // Nothing to do if already active or window doesn't exist
-      if (
-        state.activeWindowId === windowId ||
-        !state.windows.find((w) => w.id === windowId)
-      ) {
+      const window = state.windows.find((w) => w.id === windowId);
+
+      // Nothing to do if window doesn't exist
+      if (!window) {
+        return state;
+      }
+
+      // Nothing to do if already active and not minimized
+      if (state.activeWindowId === windowId && !window.isMinimized) {
         return state;
       }
 
       // Find highest z-index
       const maxZIndex = Math.max(...state.windows.map((w) => w.zIndex));
 
-      // Update windows z-indices
-      const updatedWindows = state.windows.map((window) => {
-        if (window.id === windowId) {
+      // Update windows z-indices and restore from minimized if necessary
+      const updatedWindows = state.windows.map((w) => {
+        if (w.id === windowId) {
           return {
-            ...window,
+            ...w,
             zIndex: maxZIndex + 1,
-            isMinimized: false, // Restore window if minimized
+            isMinimized: false, // Always restore from minimized when activating
           };
         }
-        return window;
+        return w;
       });
 
       return {
@@ -169,8 +187,9 @@ const useWindowsStore = create((set, get) => ({
         w.id === windowId ? { ...w, isMinimized } : w
       );
 
-      // If minimizing the active window, set active to null
+      // If minimizing the active window, set active to null or next visible window
       let activeId = state.activeWindowId;
+
       if (isMinimized && state.activeWindowId === windowId) {
         // Find next visible window with highest z-index
         const visibleWindows = updatedWindows.filter((w) => !w.isMinimized);
@@ -184,6 +203,19 @@ const useWindowsStore = create((set, get) => ({
         } else {
           activeId = null;
         }
+      }
+      // If we're un-minimizing a window, make it the active window
+      else if (!isMinimized) {
+        activeId = windowId;
+
+        // Also update z-index to bring window to front
+        const maxZIndex = Math.max(...updatedWindows.map((w) => w.zIndex));
+        return {
+          windows: updatedWindows.map((w) =>
+            w.id === windowId ? { ...w, isMinimized, zIndex: maxZIndex + 1 } : w
+          ),
+          activeWindowId: windowId,
+        };
       }
 
       return {
@@ -231,4 +263,4 @@ const useWindowsStore = create((set, get) => ({
 }));
 
 // Export the store and constants
-export { useWindowsStore, APP_TYPES };
+export { useWindowsStore, APP_TYPES, APP_THEMES };

@@ -23,6 +23,7 @@ import MusicPlayer from "../../apps/musicPlayer/MusicPlayer";
 import Notepad from "../../apps/notepad/Notepad";
 import TerminalApp from "../../apps/terminal";
 import Taskbar from "../Taskbar";
+import DarkWebBrowser from "../../apps/darkWeb";
 import styles from "./Desktop.module.scss";
 
 // Import app components - these will be loaded dynamically based on window type
@@ -39,6 +40,7 @@ const APP_COMPONENTS = {
   [APP_TYPES.MUSIC_PLAYER]: MusicPlayer,
   [APP_TYPES.NOTEPAD]: Notepad,
   [APP_TYPES.HACKING_TOOL]: TerminalApp, // Add this line
+  [APP_TYPES.DARK_WEB]: DarkWebBrowser,
   // Other app types will be filled in later
 };
 
@@ -99,6 +101,9 @@ const Desktop = () => {
   const setActiveWindow = useWindowsStore((state) => state.setActiveWindow);
   const openWindow = useWindowsStore((state) => state.openWindow);
   const toggleMinimize = useWindowsStore((state) => state.toggleMinimize);
+  const shouldUseDarkHackerTheme = useWindowsStore(
+    (state) => state.shouldUseDarkHackerTheme
+  );
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
 
   // Get audio controls
@@ -229,7 +234,7 @@ const Desktop = () => {
               onMinimize={toggleMinimize}
               resizable={false}
               onFocus={setActiveWindow}
-              darkHackerTheme={window.appType === APP_TYPES.DARK_WEB}
+              darkHackerTheme={shouldUseDarkHackerTheme(window.appType)}
             >
               <AppComponent {...window.props} />
             </Window>
