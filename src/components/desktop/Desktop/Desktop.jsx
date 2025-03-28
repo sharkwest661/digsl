@@ -11,11 +11,17 @@ import {
   Clipboard,
   Search,
 } from "lucide-react";
-import { useWindowsStore, useThemeStore, APP_TYPES } from "../../../store";
+import {
+  useWindowsStore,
+  useThemeStore,
+  APP_TYPES,
+  useAudioStore,
+} from "../../../store";
 import { Window } from "../../ui";
 import { Scanlines, CRTEffect } from "../../effects/Scanlines";
 import MusicPlayer from "../../apps/musicPlayer/MusicPlayer";
 import Notepad from "../../apps/notepad/Notepad";
+import TerminalApp from "../../apps/terminal";
 import Taskbar from "../Taskbar";
 import styles from "./Desktop.module.scss";
 
@@ -32,6 +38,7 @@ const AppPlaceholder = ({ appType }) => (
 const APP_COMPONENTS = {
   [APP_TYPES.MUSIC_PLAYER]: MusicPlayer,
   [APP_TYPES.NOTEPAD]: Notepad,
+  [APP_TYPES.HACKING_TOOL]: TerminalApp, // Add this line
   // Other app types will be filled in later
 };
 
@@ -39,7 +46,7 @@ const APP_COMPONENTS = {
 const desktopApps = [
   {
     id: APP_TYPES.MUSIC_PLAYER,
-    title: "Music Player",
+    title: "Music",
     icon: <Music size={24} />,
   },
   {
@@ -94,9 +101,34 @@ const Desktop = () => {
   const toggleMinimize = useWindowsStore((state) => state.toggleMinimize);
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
 
+  // Get audio controls
+  const isPlaying = useAudioStore((state) => state.isPlaying);
+  const togglePlay = useAudioStore((state) => state.togglePlay);
+
   // Local state
   const [selectedIcon, setSelectedIcon] = useState(null);
   const [hoveredIcon, setHoveredIcon] = useState(null);
+  const [previousWindows, setPreviousWindows] = useState([]);
+
+  // Effect to track window changes and pause music if music player is closed
+  useEffect(() => {
+    // Check if music player window was closed
+    const musicPlayerWasOpen = previousWindows.some(
+      (window) => window.appType === APP_TYPES.MUSIC_PLAYER
+    );
+
+    const musicPlayerIsOpen = allWindows.some(
+      (window) => window.appType === APP_TYPES.MUSIC_PLAYER
+    );
+
+    // If music player was open but is no longer open and music is playing, pause it
+    if (musicPlayerWasOpen && !musicPlayerIsOpen && isPlaying) {
+      togglePlay();
+    }
+
+    // Update previous windows
+    setPreviousWindows(allWindows);
+  }, [allWindows, previousWindows, isPlaying, togglePlay]);
 
   // Handle single click on icon (select)
   const handleIconClick = (appType) => {

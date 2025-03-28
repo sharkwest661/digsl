@@ -8,7 +8,7 @@ const APP_TYPES = {
   DATABASE: "database",
   EVIDENCE_BOARD: "evidenceBoard",
   EMAIL: "email",
-  NOTEPAD: "notepad", // Make sure this is correctly defined
+  NOTEPAD: "notepad",
   FILE_EXPLORER: "fileExplorer",
   MUSIC_PLAYER: "musicPlayer",
   HACKING_TOOL: "hackingTool",
@@ -77,6 +77,8 @@ const useWindowsStore = create((set, get) => ({
 
   // Close a window
   closeWindow: (windowId) => {
+    const window = get().windows.find((w) => w.id === windowId);
+
     set((state) => {
       // Filter out the closed window
       const updatedWindows = state.windows.filter(
@@ -101,6 +103,22 @@ const useWindowsStore = create((set, get) => ({
         activeWindowId: activeId,
       };
     });
+
+    // Special handling for music player - pause music when window is closed
+    // This is added to fix the issue of music continuing to play when the player is closed
+    if (window && window.appType === APP_TYPES.MUSIC_PLAYER) {
+      // Use dynamic import to avoid circular dependency issues
+      import("./audioStore")
+        .then((module) => {
+          const audioStore = module.useAudioStore.getState();
+          if (audioStore.isPlaying) {
+            audioStore.togglePlay(); // Pause the music
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to import audioStore:", error);
+        });
+    }
   },
 
   // Set a window as active (bring to front)
@@ -188,6 +206,23 @@ const useWindowsStore = create((set, get) => ({
 
   // Close all windows
   closeAllWindows: () => {
+    // Check if music player is open and pause it
+    const musicPlayerWindow = get().windows.find(
+      (w) => w.appType === APP_TYPES.MUSIC_PLAYER
+    );
+    if (musicPlayerWindow) {
+      import("./audioStore")
+        .then((module) => {
+          const audioStore = module.useAudioStore.getState();
+          if (audioStore.isPlaying) {
+            audioStore.togglePlay(); // Pause the music
+          }
+        })
+        .catch((error) => {
+          console.error("Failed to import audioStore:", error);
+        });
+    }
+
     set({
       windows: [],
       activeWindowId: null,
