@@ -38,6 +38,7 @@ const AppPlaceholder = ({ appType }) => (
 
 // Import Database component
 import DatabaseSearch from "../../apps/database";
+import SearchEngine from "../../apps/searchEngine";
 
 // Map of app types to components
 const APP_COMPONENTS = {
@@ -47,6 +48,7 @@ const APP_COMPONENTS = {
   [APP_TYPES.DARK_WEB]: DarkWebBrowser,
   [APP_TYPES.EVIDENCE_BOARD]: EvidenceBoard,
   [APP_TYPES.DATABASE]: DatabaseSearch,
+  [APP_TYPES.SEARCH_ENGINE]: SearchEngine, // Placeholder for Search Engine
   // Other app types will be filled in later
 };
 
