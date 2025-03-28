@@ -1,0 +1,142 @@
+// components/apps/evidenceBoard/EditEvidenceModal.module.scss
+@import "../../../styles/variables.scss";
+@import "../../../styles/mixins.scss";
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formRow {
+  display: flex;
+  gap: 20px;
+
+  .formGroup {
+    flex: 1;
+  }
+}
+
+.label {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: $cyber-cyan;
+  font-weight: 500;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: $font-content;
+  font-size: 14px;
+  color: $cyber-text-light;
+  user-select: none;
+  cursor: pointer;
+}
+
+.input,
+.select,
+.textarea {
+  background-color: rgba($cyber-dark-blue, 0.7);
+  border: 1px solid $cyber-neon-pink;
+  color: $cyber-text-light;
+  padding: 8px 12px;
+  font-family: $font-content;
+  font-size: 14px;
+  border-radius: 2px;
+  outline: none;
+  transition: all $transition-standard ease;
+
+  &:focus {
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
+    border-color: lighten($cyber-neon-pink, 10%);
+  }
+
+  &::placeholder {
+    color: rgba($cyber-text-light, 0.5);
+  }
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.checkbox {
+  width: 16px;
+  height: 16px;
+  accent-color: $cyber-neon-pink;
+  cursor: pointer;
+}
+
+.colorOptions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.colorOption {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  border: 2px solid transparent;
+  transition: all $transition-standard ease;
+
+  &.selected {
+    transform: scale(1.1);
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.7);
+  }
+
+  &:hover:not(.selected) {
+    transform: scale(1.05);
+  }
+}
+
+.colorInput {
+  position: absolute;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.colorSwatch {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 2px;
+}
+
+// Color variants
+.cyan .colorSwatch {
+  background-color: $cyber-cyan;
+}
+
+.pink .colorSwatch {
+  background-color: $cyber-neon-pink;
+}
+
+.orange .colorSwatch {
+  background-color: #ff7700;
+}
+
+.green .colorSwatch {
+  background-color: #00ff66;
+}
+
+.red .colorSwatch {
+  background-color: $cyber-warning-red;
+}
+
+.purple .colorSwatch {
+  background-color: #9966ff;
+}
