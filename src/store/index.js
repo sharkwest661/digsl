@@ -10,6 +10,7 @@ import { useNotepadStore } from "./notepadStore";
 import { useAudioStore } from "./audioStore";
 import { useDarkWebStore } from "./darkWebStore";
 import { useEvidenceBoardStore } from "./evidenceBoardStore";
+import { useDatabaseStore, DATABASE_TYPES } from "./databaseStore";
 
 // Export all stores and constants
 export {
@@ -36,4 +37,8 @@ export {
 
   // Evidence Board store
   useEvidenceBoardStore,
+
+  // Database store
+  useDatabaseStore,
+  DATABASE_TYPES,
 };

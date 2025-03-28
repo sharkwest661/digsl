@@ -5,14 +5,15 @@
   "english": "İngiliscə",
   "azerbaijani": "Azərbaycanca",
   "theme": "Mövzu",
-  "tagline": "2000-ci illərin əvvəllərində Azərbaycanda həqiqəti kəşf edin",
+  "tagline": "2003-cü ilin Azərbaycanında bir sıra qətlləri həll edin",
   "gameDescription": "Digital Detectivə xoş gəlmisiniz",
-  "gameDescriptionText1": "2000-ci illərin əvvəllərində Azərbaycanın sayberpank versiyasında mürəkkəb bir sirri həll etmək üçün simulyasiya edilmiş OS interfeysi ilə işləyin.",
-  "gameDescriptionText2": "Verilənlər bazalarında axtarış aparın, sübutları təhlil edin, ipuçları birləşdirin və rəqəmsal landşaftda gizlənmiş həqiqəti kəşf edin.",
+  "gameDescriptionText1": "2003-cü ilin Azərbaycanının rəqəmsal yeraltı dünyasında fəaliyyət göstərən bir serial qatili araşdırmaq üçün simulyasiya edilmiş OS interfeysindən istifadə edin.",
+  "gameDescriptionText2": "Verilənlər bazalarında axtarış aparın, rəqəmsal sübutları təhlil edin, onlayn fəaliyyəti izləyin və qatili tapmaq üçün qurbanlar arasındakı əlaqələri aşkar edin.",
   "gameStarted": "Oyun yüklənir...",
   "gameStartedMessage": "OS işə salınır. Zəhmət olmasa gözləyin...",
   "musicPlayer": "Musiqi Pleyeri",
   "showPlaylist": "PLEYLIST GÖSTƏR",
   "hidePlaylist": "PLEYLIST GİZLƏT",
-  "switchTheme": "MÖVZUNU DƏYİŞDİR"
+  "switchTheme": "MÖVZUNU DƏYİŞDİR",
+  "percentComplete": "%"
 }
