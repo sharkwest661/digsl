@@ -1,0 +1,343 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/mixins.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  @include custom-scrollbar(rgba(0, 0, 0, 0.5), rgba($hacker-green, 0.5));
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  font-family: $font-mono;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+    box-shadow: 0 0 8px rgba($hacker-green, 0.3);
+  }
+}
+
+.authBadge,
+.lockBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  font-family: $font-mono;
+  font-size: 12px;
+  border-radius: 2px;
+}
+
+.authBadge {
+  background-color: rgba($hacker-green, 0.1);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+}
+
+.lockBadge {
+  background-color: rgba(255, 51, 51, 0.1);
+  border: 1px solid $hacker-red;
+  color: $hacker-red;
+}
+
+.profileContainer {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid $hacker-green;
+  display: flex;
+  flex-direction: column;
+}
+
+.profileHeader {
+  display: flex;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba($hacker-green, 0.3);
+}
+
+.vendorAvatar {
+  width: 64px;
+  height: 64px;
+  background-color: rgba($hacker-green, 0.2);
+  border: 2px solid $hacker-green;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: $font-display;
+  font-size: 32px;
+  color: $hacker-green;
+  margin-right: 20px;
+  box-shadow: 0 0 10px rgba($hacker-green, 0.2);
+}
+
+.vendorInfo {
+  flex: 1;
+}
+
+.vendorName {
+  font-family: $font-display;
+  font-size: 24px;
+  color: $hacker-green;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px rgba($hacker-green, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.accessUnlocked {
+  font-size: 12px;
+  font-family: $font-mono;
+  background-color: rgba($hacker-green, 0.2);
+  color: $hacker-green;
+  padding: 2px 6px;
+  border-radius: 2px;
+  border: 1px solid rgba($hacker-green, 0.5);
+}
+
+.vendorMeta {
+  display: flex;
+  gap: 20px;
+}
+
+.vendorRating,
+.transactionCount,
+.joinDate {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.8);
+}
+
+.ratingIcon,
+.cartIcon {
+  color: $hacker-green;
+}
+
+.profileBody {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vendorQuote {
+  font-family: $font-content;
+  font-style: italic;
+  font-size: 16px;
+  color: $hacker-green;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-left: 3px solid $hacker-green;
+  margin-bottom: 10px;
+}
+
+.identityReveal {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid $hacker-green;
+  padding: 15px;
+  animation: fadeIn 0.5s ease;
+}
+
+.revealHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+
+  h3 {
+    font-family: $font-mono;
+    font-size: 16px;
+    color: $hacker-green;
+    font-weight: normal;
+  }
+}
+
+.revealContent {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 15px;
+}
+
+.dataRow {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dataLabel {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.7);
+}
+
+.dataValue {
+  font-family: $font-content;
+  font-size: 14px;
+  color: $hacker-green;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border: 1px solid rgba($hacker-green, 0.3);
+}
+
+.identityLocked {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid $hacker-red;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+
+  h3 {
+    font-family: $font-mono;
+    font-size: 16px;
+    color: $hacker-red;
+    margin: 5px 0;
+  }
+
+  p {
+    font-family: $font-content;
+    font-size: 14px;
+    color: rgba($hacker-red, 0.8);
+    margin: 0;
+  }
+}
+
+.hackHint {
+  margin-top: 10px;
+  font-style: italic;
+  font-size: 12px !important;
+  color: rgba($hacker-green, 0.8) !important;
+}
+
+.listingsSection {
+  margin-top: 20px;
+}
+
+.sectionTitle {
+  font-family: $font-mono;
+  font-size: 18px;
+  color: $hacker-green;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba($hacker-green, 0.3);
+}
+
+.vendorListings {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.listingItem {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba($hacker-green, 0.4);
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: $hacker-green;
+    box-shadow: 0 0 8px rgba($hacker-green, 0.3);
+    transform: translateY(-2px);
+  }
+}
+
+.listingTitle {
+  font-family: $font-content;
+  font-size: 16px;
+  color: $hacker-green;
+  margin-bottom: 10px;
+}
+
+.listingMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.listingId {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.7);
+}
+
+.listingPrice {
+  font-family: $font-mono;
+  font-size: 14px;
+  font-weight: 600;
+  color: $hacker-green;
+}
+
+.noListings {
+  padding: 30px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0.3);
+  font-family: $font-content;
+  font-size: 14px;
+  color: rgba($hacker-green, 0.7);
+  font-style: italic;
+}
+
+.errorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+
+  h2 {
+    font-family: $font-mono;
+    font-size: 20px;
+    color: $hacker-red;
+    margin: 15px 0 5px;
+  }
+
+  p {
+    font-family: $font-content;
+    font-size: 14px;
+    color: rgba($hacker-red, 0.8);
+    margin-bottom: 20px;
+  }
+}
+
+.errorIcon {
+  color: $hacker-red;
+  margin-bottom: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

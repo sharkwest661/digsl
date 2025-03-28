@@ -1,0 +1,269 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/mixins.scss";
+
+.browser {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background-color: $hacker-bg;
+  color: $hacker-green;
+  overflow: hidden;
+  position: relative;
+}
+
+.header {
+  padding: 12px;
+  background-color: $hacker-panel;
+  border-bottom: 1px solid $hacker-green;
+}
+
+.addressBar {
+  display: flex;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid $hacker-green;
+  padding: 6px 10px;
+  border-radius: 2px;
+}
+
+.addressPrefix {
+  display: flex;
+  align-items: center;
+  margin-right: 8px;
+}
+
+.secureIcon {
+  color: $hacker-green;
+}
+
+.insecureIcon {
+  color: $hacker-red;
+}
+
+.addressInput {
+  flex: 1;
+  background: none;
+  border: none;
+  color: $hacker-green;
+  font-family: $font-mono;
+  font-size: 14px;
+  outline: none;
+
+  &:focus {
+    outline: none;
+  }
+}
+
+.goButton {
+  background: none;
+  border: none;
+  color: $hacker-green;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  margin-left: 4px;
+  border-radius: 2px;
+
+  &:hover {
+    background-color: rgba(51, 255, 0, 0.1);
+  }
+}
+
+.content {
+  flex: 1;
+  overflow-y: auto;
+  position: relative;
+  @include custom-scrollbar(rgba(0, 0, 0, 0.5), rgba($hacker-green, 0.5));
+}
+
+.connectPrompt {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 20px;
+  text-align: center;
+
+  h2 {
+    margin-top: 16px;
+    margin-bottom: 8px;
+    font-family: $font-mono;
+    color: $hacker-green;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 0 0 5px rgba($hacker-green, 0.7);
+  }
+
+  p {
+    max-width: 400px;
+    margin-bottom: 12px;
+    font-family: $font-content;
+    color: rgba($hacker-green, 0.8);
+  }
+}
+
+.shieldIcon {
+  color: $hacker-green;
+  opacity: 0.7;
+}
+
+.warning {
+  margin-top: 16px;
+  padding: 10px;
+  background-color: rgba($hacker-red, 0.1);
+  border: 1px solid $hacker-red;
+  color: $hacker-red;
+  font-family: $font-mono;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.connectButton {
+  margin-top: 20px;
+  padding: 8px 16px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  font-family: $font-mono;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+    box-shadow: 0 0 8px rgba($hacker-green, 0.5);
+  }
+}
+
+.statusBar {
+  height: 24px;
+  background-color: $hacker-panel;
+  border-top: 1px solid $hacker-green;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-family: $font-mono;
+  font-size: 12px;
+}
+
+.statusItem {
+  display: flex;
+  align-items: center;
+}
+
+.statusDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $hacker-green;
+  margin-right: 6px;
+  animation: pulse 2s infinite;
+}
+
+.encryptionBadge {
+  background-color: rgba($hacker-green, 0.2);
+  color: $hacker-green;
+  padding: 2px 6px;
+  border-radius: 3px;
+  margin-left: 8px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.refreshIcon {
+  margin-right: 5px;
+  opacity: 0.7;
+}
+
+.invalidUrl {
+  margin: 15px 0;
+  padding: 10px;
+  background-color: rgba($hacker-red, 0.1);
+  border: 1px solid $hacker-red;
+  color: $hacker-red;
+  font-family: $font-mono;
+  font-size: 12px;
+  max-width: 400px;
+}
+
+/* Modal styles */
+.modalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-family: $font-content;
+
+  p {
+    margin-bottom: 12px;
+    text-align: center;
+    line-height: 1.5;
+    color: $hacker-green;
+  }
+}
+
+.modalIcon {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 15px;
+  color: $hacker-red;
+}
+
+.emphasizedUrl {
+  font-family: $font-mono;
+  background-color: rgba($hacker-bg, 0.5);
+  padding: 2px 5px;
+  border: 1px solid rgba($hacker-green, 0.3);
+}
+
+.modalCancelButton,
+.modalConfirmButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 16px;
+  font-family: $font-mono;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalCancelButton {
+  background-color: rgba($hacker-bg, 0.7);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+    box-shadow: 0 0 8px rgba($hacker-green, 0.3);
+  }
+}
+
+.modalConfirmButton {
+  background-color: rgba($hacker-red, 0.1);
+  border: 1px solid $hacker-red;
+  color: $hacker-red;
+
+  &:hover {
+    background-color: rgba($hacker-red, 0.2);
+    box-shadow: 0 0 8px rgba($hacker-red, 0.3);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}

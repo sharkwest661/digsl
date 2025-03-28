@@ -21,9 +21,19 @@ const App = () => {
     // Set playlist data
     setPlaylist(PLAYLIST_DATA);
 
+    // Prevent right-click context menu
+    const handleContextMenu = (e) => {
+      e.preventDefault();
+      return false;
+    };
+
+    // Add event listener
+    document.addEventListener("contextmenu", handleContextMenu);
+
     // Cleanup on unmount
     return () => {
       useAudioStore.getState().cleanup();
+      document.removeEventListener("contextmenu", handleContextMenu);
     };
   }, [initAudio, setPlaylist]);
 

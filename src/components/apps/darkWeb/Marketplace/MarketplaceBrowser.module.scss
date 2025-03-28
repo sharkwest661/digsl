@@ -1,0 +1,389 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/mixins.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba($hacker-green, 0.3);
+}
+
+.title {
+  font-family: $font-display;
+  font-size: 24px;
+  font-weight: 700;
+  color: $hacker-green;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  text-shadow: 0 0 5px rgba($hacker-green, 0.7);
+}
+
+.headerRight {
+  display: flex;
+  align-items: center;
+}
+
+.networkStatus {
+  display: flex;
+  align-items: center;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $hacker-green;
+}
+
+.statusIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: $hacker-green;
+  margin-right: 8px;
+  box-shadow: 0 0 5px $hacker-green;
+  animation: pulse 2s infinite;
+}
+
+.searchContainer {
+  display: flex;
+  margin-bottom: 15px;
+  gap: 10px;
+}
+
+.searchForm {
+  flex: 1;
+  display: flex;
+  position: relative;
+}
+
+.searchBar {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  font-family: $font-mono;
+  font-size: 14px;
+  border-radius: 2px;
+  outline: none;
+
+  &:focus {
+    box-shadow: 0 0 8px rgba($hacker-green, 0.4);
+  }
+
+  &::placeholder {
+    color: rgba($hacker-green, 0.5);
+  }
+}
+
+.searchButton {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 40px;
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $hacker-green;
+  cursor: pointer;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+  }
+}
+
+.filtersButton {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 12px;
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  font-family: $font-mono;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+  }
+}
+
+.filtersContainer {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid $hacker-green;
+  padding: 15px;
+  margin-bottom: 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+.filterGroup {
+  margin-bottom: 15px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.filterLabel {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: $hacker-green;
+  margin-bottom: 8px;
+}
+
+.filterOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.filterOption {
+  padding: 6px 10px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba($hacker-green, 0.5);
+  color: rgba($hacker-green, 0.8);
+  font-size: 12px;
+  font-family: $font-mono;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+    border-color: $hacker-green;
+  }
+
+  &.active {
+    background-color: rgba($hacker-green, 0.2);
+    border-color: $hacker-green;
+    color: $hacker-green;
+    box-shadow: 0 0 5px rgba($hacker-green, 0.3);
+  }
+}
+
+.resultsInfo {
+  font-family: $font-mono;
+  font-size: 14px;
+  color: rgba($hacker-green, 0.8);
+  margin-bottom: 15px;
+}
+
+.listingsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+  padding-right: 5px;
+}
+
+.listingCard {
+  background-color: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba($hacker-green, 0.5);
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    border-color: $hacker-green;
+    box-shadow: 0 0 10px rgba($hacker-green, 0.3);
+    transform: translateY(-2px);
+
+    .listingTitle {
+      color: $hacker-green;
+      text-shadow: 0 0 5px rgba($hacker-green, 0.7);
+
+      &::before,
+      &::after {
+        opacity: 0.5;
+        animation: glitch 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) both
+          infinite;
+      }
+    }
+  }
+}
+
+.listingTitle {
+  font-family: $font-display;
+  font-size: 18px;
+  font-weight: 600;
+  color: rgba($hacker-green, 0.9);
+  margin-bottom: 10px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+
+  // Glitch effect setup
+  &::before,
+  &::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+  }
+
+  &::before {
+    color: #00aaff;
+    z-index: -1;
+    transform: translateX(-2px);
+  }
+
+  &::after {
+    color: #ff3300;
+    z-index: -2;
+    transform: translateX(2px);
+  }
+}
+
+.verifiedIcon {
+  color: $hacker-green;
+}
+
+.listingDescription {
+  font-family: $font-content;
+  font-size: 14px;
+  color: rgba($hacker-green, 0.8);
+  margin-bottom: 15px;
+  line-height: 1.4;
+}
+
+.listingMeta {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.listingVendor {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: $hacker-green;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+
+  &:hover {
+    text-shadow: 0 0 3px rgba($hacker-green, 0.7);
+  }
+}
+
+.listingRating {
+  font-family: $font-mono;
+  font-size: 13px;
+  color: rgba($hacker-green, 0.8);
+}
+
+.listingFooter {
+  display: flex;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 1px solid rgba($hacker-green, 0.3);
+}
+
+.listingId {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.7);
+}
+
+.listingPrice {
+  font-family: $font-mono;
+  font-size: 14px;
+  font-weight: 600;
+  color: $hacker-green;
+}
+
+.noResults {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 0;
+  text-align: center;
+
+  h3 {
+    font-family: $font-mono;
+    font-size: 18px;
+    color: $hacker-green;
+    margin: 15px 0 5px;
+  }
+
+  p {
+    font-family: $font-content;
+    font-size: 14px;
+    color: rgba($hacker-green, 0.7);
+  }
+}
+
+.noResultsIcon {
+  width: 50px;
+  height: 50px;
+  border: 2px solid $hacker-green;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  color: $hacker-green;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}

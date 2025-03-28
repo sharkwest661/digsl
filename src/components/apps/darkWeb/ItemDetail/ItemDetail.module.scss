@@ -1,0 +1,408 @@
+@import "../../../../styles/variables.scss";
+@import "../../../../styles/mixins.scss";
+
+.container {
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  @include custom-scrollbar(rgba(0, 0, 0, 0.5), rgba($hacker-green, 0.5));
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.backButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  font-family: $font-mono;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba($hacker-green, 0.1);
+    box-shadow: 0 0 8px rgba($hacker-green, 0.3);
+  }
+}
+
+.itemContainer {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid $hacker-green;
+  display: flex;
+  flex-direction: column;
+}
+
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba($hacker-green, 0.3);
+}
+
+.itemTitleSection {
+  flex: 1;
+  margin-right: 20px;
+}
+
+.itemTitle {
+  font-family: $font-display;
+  font-size: 24px;
+  color: $hacker-green;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px rgba($hacker-green, 0.5);
+}
+
+.itemId {
+  font-family: $font-mono;
+  font-size: 14px;
+  color: rgba($hacker-green, 0.7);
+}
+
+.itemPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border: 1px solid rgba($hacker-green, 0.4);
+  min-width: 150px;
+}
+
+.priceLabel {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.7);
+  margin-bottom: 5px;
+}
+
+.priceValue {
+  font-family: $font-mono;
+  font-size: 20px;
+  font-weight: 600;
+  color: $hacker-green;
+  text-shadow: 0 0 5px rgba($hacker-green, 0.3);
+}
+
+.itemDetails {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.mainInfo {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 15px;
+  border: 1px solid rgba($hacker-green, 0.3);
+}
+
+.infoGroup {
+  display: flex;
+  flex-direction: column;
+}
+
+.infoLabel {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.7);
+  margin-bottom: 6px;
+}
+
+.infoValue {
+  font-family: $font-content;
+  font-size: 14px;
+  color: $hacker-green;
+  background-color: rgba(0, 0, 0, 0.2);
+  padding: 8px;
+  border: 1px solid rgba($hacker-green, 0.3);
+}
+
+.vendorLink {
+  background: none;
+  border: none;
+  padding: 0;
+  color: $hacker-green;
+  font-family: $font-content;
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  &:hover {
+    text-shadow: 0 0 3px rgba($hacker-green, 0.7);
+  }
+}
+
+.unlockedBadge {
+  font-size: 10px;
+  font-family: $font-mono;
+  background-color: rgba($hacker-green, 0.2);
+  color: $hacker-green;
+  padding: 2px 4px;
+  border-radius: 2px;
+  border: 1px solid rgba($hacker-green, 0.5);
+}
+
+.collapseSection {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba($hacker-green, 0.3);
+  cursor: pointer;
+
+  &.expanded {
+    border-color: $hacker-green;
+  }
+
+  &:hover .sectionHeader {
+    background-color: rgba($hacker-green, 0.1);
+  }
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  transition: background-color 0.2s ease;
+}
+
+.sectionTitle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 16px;
+  color: $hacker-green;
+}
+
+.sectionContent {
+  padding: 0 15px 15px;
+  animation: fadeIn 0.3s ease;
+}
+
+.description {
+  font-family: $font-content;
+  font-size: 14px;
+  color: $hacker-green;
+  line-height: 1.6;
+  white-space: pre-line;
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.review {
+  background-color: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border: 1px solid rgba($hacker-green, 0.3);
+}
+
+.reviewHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.reviewerName {
+  font-family: $font-mono;
+  font-size: 14px;
+  color: $hacker-green;
+}
+
+.reviewRating {
+  color: $hacker-green;
+  font-size: 14px;
+}
+
+.reviewContent {
+  font-family: $font-content;
+  font-size: 14px;
+  color: rgba($hacker-green, 0.9);
+  margin-bottom: 10px;
+  line-height: 1.5;
+}
+
+.reviewDate {
+  font-family: $font-mono;
+  font-size: 12px;
+  color: rgba($hacker-green, 0.6);
+  text-align: right;
+}
+
+.warningBox {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: rgba($hacker-red, 0.1);
+  border: 1px solid $hacker-red;
+  padding: 15px;
+}
+
+.warningIcon {
+  color: $hacker-red;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.warningContent {
+  flex: 1;
+}
+
+.warningTitle {
+  font-family: $font-mono;
+  font-size: 14px;
+  color: $hacker-red;
+  margin-bottom: 5px;
+}
+
+.warningText {
+  font-family: $font-content;
+  font-size: 13px;
+  color: rgba($hacker-red, 0.9);
+  line-height: 1.5;
+}
+
+.itemActions {
+  display: flex;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.actionButton,
+.purchaseButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 15px;
+  font-family: $font-mono;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+.actionButton {
+  background-color: rgba(0, 0, 0, 0.4);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  flex: 1;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($hacker-green, 0.1);
+    box-shadow: 0 0 8px rgba($hacker-green, 0.3);
+  }
+}
+
+.purchaseButton {
+  background-color: rgba($hacker-green, 0.2);
+  border: 1px solid $hacker-green;
+  color: $hacker-green;
+  flex: 2;
+
+  &:hover:not(:disabled) {
+    background-color: rgba($hacker-green, 0.3);
+    box-shadow: 0 0 10px rgba($hacker-green, 0.4);
+  }
+}
+
+.adminPanel {
+  margin-top: 20px;
+  background-color: rgba($hacker-green, 0.1);
+  border: 1px solid $hacker-green;
+  padding: 15px;
+  animation: fadeIn 0.5s ease;
+}
+
+.adminHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: $font-mono;
+  font-size: 14px;
+  color: $hacker-green;
+  margin-bottom: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba($hacker-green, 0.3);
+}
+
+.adminContent {
+  font-family: $font-content;
+  font-size: 14px;
+  color: rgba($hacker-green, 0.9);
+  line-height: 1.5;
+}
+
+.errorMessage {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+
+  h2 {
+    font-family: $font-mono;
+    font-size: 20px;
+    color: $hacker-red;
+    margin: 15px 0 5px;
+  }
+
+  p {
+    font-family: $font-content;
+    font-size: 14px;
+    color: rgba($hacker-red, 0.8);
+    margin-bottom: 20px;
+  }
+}
+
+.errorIcon {
+  color: $hacker-red;
+  margin-bottom: 10px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
