@@ -31,11 +31,13 @@ const MusicPlayer = () => {
   const currentTime = useAudioStore((state) => state.currentTime);
   const seekTo = useAudioStore((state) => state.seekTo);
   const playlist = useAudioStore((state) => state.playlist);
+  const favorites = useAudioStore((state) => state.favorites);
+  const toggleFavorite = useAudioStore((state) => state.toggleFavorite);
+  const isFavorite = useAudioStore((state) => state.isFavorite);
 
   // Local state
   const [progress, setProgress] = useState(0);
   const [selectedView, setSelectedView] = useState("player"); // 'player' or 'playlist'
-  const [favorites, setFavorites] = useState([]);
   const [previousVolume, setPreviousVolume] = useState(40);
   const [visualizerData, setVisualizerData] = useState([]);
 
@@ -138,13 +140,9 @@ const MusicPlayer = () => {
     }
   };
 
-  // Toggle favorite status
-  const toggleFavorite = (trackId) => {
-    if (favorites.includes(trackId)) {
-      setFavorites(favorites.filter((id) => id !== trackId));
-    } else {
-      setFavorites([...favorites, trackId]);
-    }
+  // Handle favorite toggle
+  const handleToggleFavorite = (trackId) => {
+    toggleFavorite(trackId);
   };
 
   // Current track information
@@ -179,10 +177,10 @@ const MusicPlayer = () => {
         <p className={styles.trackArtist}>{currentTrack?.artist || ""}</p>
         {currentTrack && (
           <button
-            onClick={() => toggleFavorite(currentTrack.id)}
+            onClick={() => handleToggleFavorite(currentTrack.id)}
             className={styles.favoriteButton}
           >
-            {favorites.includes(currentTrack.id) ? (
+            {isFavorite(currentTrack.id) ? (
               <Heart
                 size={18}
                 fill={themeConfig.accentPrimary}
@@ -316,11 +314,11 @@ const MusicPlayer = () => {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  toggleFavorite(track.id);
+                  handleToggleFavorite(track.id);
                 }}
                 className={styles.trackFavorite}
               >
-                {favorites.includes(track.id) ? (
+                {isFavorite(track.id) ? (
                   <Heart
                     size={14}
                     fill={themeConfig.accentPrimary}

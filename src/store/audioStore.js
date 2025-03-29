@@ -1,6 +1,26 @@
 // store/audioStore.js
 import { create } from "zustand";
 
+// Load favorites from localStorage
+const loadFavoritesFromLocalStorage = () => {
+  try {
+    const savedFavorites = localStorage.getItem("music_favorites");
+    return savedFavorites ? JSON.parse(savedFavorites) : [];
+  } catch (error) {
+    console.error("Error loading music favorites from localStorage:", error);
+    return [];
+  }
+};
+
+// Save favorites to localStorage
+const saveFavoritesToLocalStorage = (favorites) => {
+  try {
+    localStorage.setItem("music_favorites", JSON.stringify(favorites));
+  } catch (error) {
+    console.error("Error saving music favorites to localStorage:", error);
+  }
+};
+
 // Audio store to manage persistent audio playback
 const useAudioStore = create((set, get) => ({
   // Audio control state
@@ -9,6 +29,9 @@ const useAudioStore = create((set, get) => ({
   volume: 30,
   duration: 0,
   currentTime: 0,
+
+  // Favorites
+  favorites: loadFavoritesFromLocalStorage(),
 
   // Audio element reference
   audioElement: null,
@@ -123,6 +146,34 @@ const useAudioStore = create((set, get) => ({
       get().audioElement.currentTime = time;
       set({ currentTime: time });
     }
+  },
+
+  // Toggle favorite status for a track
+  toggleFavorite: (trackId) => {
+    const favorites = get().favorites;
+    let updatedFavorites;
+
+    if (favorites.includes(trackId)) {
+      // Remove from favorites
+      updatedFavorites = favorites.filter((id) => id !== trackId);
+    } else {
+      // Add to favorites
+      updatedFavorites = [...favorites, trackId];
+    }
+
+    // Update localStorage
+    saveFavoritesToLocalStorage(updatedFavorites);
+
+    // Update state
+    set({ favorites: updatedFavorites });
+
+    // Return the new favorite status
+    return !favorites.includes(trackId);
+  },
+
+  // Check if a track is favorited
+  isFavorite: (trackId) => {
+    return get().favorites.includes(trackId);
   },
 
   // Clean up

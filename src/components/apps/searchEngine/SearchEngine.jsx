@@ -9,7 +9,7 @@ import {
   AlertTriangle,
   ExternalLink,
 } from "lucide-react";
-import { useThemeStore } from "../../../store";
+import { useThemeStore, useSearchEngineStore } from "../../../store";
 import { Scanlines } from "../../effects/Scanlines";
 import WebContent, { WEB_CONTENT } from "./WebContent";
 import styles from "./SearchEngine.module.scss";
@@ -107,46 +107,28 @@ const SearchEngine = () => {
   const themeConfig = useThemeStore((state) => state.themeConfig);
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
 
-  // Local state
+  // Get search engine state from store
+  const bookmarks = useSearchEngineStore((state) => state.bookmarks);
+  const addBookmark = useSearchEngineStore((state) => state.addBookmark);
+  const removeBookmark = useSearchEngineStore((state) => state.removeBookmark);
+  const isBookmarked = useSearchEngineStore((state) => state.isBookmarked);
+  const currentUrl = useSearchEngineStore((state) => state.currentUrl);
+  const showWebContent = useSearchEngineStore((state) => state.showWebContent);
+  const setBrowsingState = useSearchEngineStore(
+    (state) => state.setBrowsingState
+  );
+  const searchHistory = useSearchEngineStore((state) => state.searchHistory);
+  const addToHistory = useSearchEngineStore((state) => state.addToHistory);
+
+  // Local state (for UI and transient state)
   const [searchQuery, setSearchQuery] = useState("");
   const [results, setResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
-  const [searchHistory, setSearchHistory] = useState([]);
   const [noResults, setNoResults] = useState(false);
   const [showError, setShowError] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
-  const [bookmarks, setBookmarks] = useState([]);
-
-  // State for WebContent component
-  const [currentUrl, setCurrentUrl] = useState(null);
-  const [showWebContent, setShowWebContent] = useState(false);
-
-  // Load persisted state when component mounts
-  useEffect(() => {
-    try {
-      // Restore search history
-      const savedHistory = localStorage.getItem("search_history");
-      if (savedHistory) {
-        setSearchHistory(JSON.parse(savedHistory));
-      }
-
-      // Restore bookmarks
-      const savedBookmarks = localStorage.getItem("search_bookmarks");
-      if (savedBookmarks) {
-        setBookmarks(JSON.parse(savedBookmarks));
-      }
-
-      // Restore current URL and view state if they exist
-      const savedState = localStorage.getItem("search_state");
-      if (savedState) {
-        const { url, showContent } = JSON.parse(savedState);
-        if (url) setCurrentUrl(url);
-        if (showContent) setShowWebContent(showContent);
-      }
-    } catch (error) {
-      console.error("Error restoring search state:", error);
-    }
-  }, []);
+  const [visitHistory, setVisitHistory] = useState([]);
+  const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
 
   // Handle search form submission
   const handleSearch = (e) => {
@@ -158,14 +140,10 @@ const SearchEngine = () => {
     setResults([]);
     setNoResults(false);
     setShowError(false);
-    setShowWebContent(false);
+    setBrowsingState(null, false); // Hide web content
 
-    // Add to search history if not already there
-    if (!searchHistory.includes(searchQuery.toLowerCase())) {
-      setSearchHistory((prev) =>
-        [searchQuery.toLowerCase(), ...prev].slice(0, 10)
-      );
-    }
+    // Add to search history
+    addToHistory(searchQuery);
 
     // Simulate network delay
     setTimeout(() => {
@@ -208,14 +186,10 @@ const SearchEngine = () => {
     setResults([]);
     setNoResults(false);
     setShowError(false);
-    setShowWebContent(false);
+    setBrowsingState(null, false); // Hide web content
 
     // Add to search history
-    if (!searchHistory.includes(suggestion.toLowerCase())) {
-      setSearchHistory((prev) =>
-        [suggestion.toLowerCase(), ...prev].slice(0, 10)
-      );
-    }
+    addToHistory(suggestion);
 
     // Simulate network delay
     setTimeout(() => {
@@ -238,7 +212,7 @@ const SearchEngine = () => {
     setResults([]);
     setNoResults(false);
     setShowError(false);
-    setShowWebContent(false);
+    setBrowsingState(null, false); // Hide web content
 
     // Simulate network delay
     setTimeout(() => {
@@ -264,35 +238,34 @@ const SearchEngine = () => {
 
   // Handle result click - show web content
   const handleResultClick = (url) => {
-    setCurrentUrl(url);
-    setShowWebContent(true);
+    setBrowsingState(url, true);
+
+    // Add to visit history
+    if (!visitHistory.includes(url)) {
+      setVisitHistory([...visitHistory, url]);
+      setCurrentHistoryIndex(visitHistory.length);
+    }
   };
 
   // Handle web content navigation
   const handleWebContentNavigate = (url) => {
-    setCurrentUrl(url);
+    setBrowsingState(url, true);
   };
 
   // Handle web content close
   const handleWebContentClose = () => {
-    setShowWebContent(false);
-    // Don't reset the currentUrl so we can restore it if minimized/reopened
+    setBrowsingState(currentUrl, false);
   };
 
   // Handle bookmark toggle
   const handleToggleBookmark = (url, title) => {
-    // Check if already bookmarked
-    const isBookmarked = bookmarks.some((bookmark) => bookmark.url === url);
-
-    if (isBookmarked) {
-      // Remove from bookmarks
-      setBookmarks(bookmarks.filter((bookmark) => bookmark.url !== url));
+    if (isBookmarked(url)) {
+      removeBookmark(url);
+      return false;
     } else {
-      // Add to bookmarks
-      setBookmarks([...bookmarks, { url, title }]);
+      addBookmark(url, title);
+      return true;
     }
-
-    return !isBookmarked; // Return new bookmark state
   };
 
   // Effect to simulate some network issues occasionally
@@ -317,9 +290,7 @@ const SearchEngine = () => {
           onClose={handleWebContentClose}
           onNavigate={handleWebContentNavigate}
           onBookmark={handleToggleBookmark}
-          isBookmarked={bookmarks.some(
-            (bookmark) => bookmark.url === currentUrl
-          )}
+          isBookmarked={isBookmarked(currentUrl)}
         />
       ) : (
         <>
@@ -528,9 +499,7 @@ const SearchEngine = () => {
                             }}
                           >
                             <Bookmark size={14} />
-                            {bookmarks.some(
-                              (bookmark) => bookmark.url === result.url
-                            )
+                            {isBookmarked(result.url)
                               ? "Bookmarked"
                               : "Bookmark"}
                           </a>

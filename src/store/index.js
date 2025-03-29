@@ -11,6 +11,7 @@ import { useAudioStore } from "./audioStore";
 import { useDarkWebStore } from "./darkWebStore";
 import { useEvidenceBoardStore } from "./evidenceBoardStore";
 import { useDatabaseStore, DATABASE_TYPES } from "./databaseStore";
+import { useSearchEngineStore } from "./searchEngineStore";
 
 // Export all stores and constants
 export {
@@ -41,4 +42,7 @@ export {
   // Database store
   useDatabaseStore,
   DATABASE_TYPES,
+
+  // Search Engine store
+  useSearchEngineStore,
 };
