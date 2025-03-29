@@ -13,7 +13,7 @@ import {
   Globe,
   Search,
 } from "lucide-react";
-import { useThemeStore } from "../../../store";
+import { useThemeStore, useSearchEngineStore } from "../../../store";
 import { Scanlines } from "../../effects/Scanlines";
 import styles from "./WebContent.module.scss";
 
@@ -306,16 +306,7 @@ export const WEB_CONTENT = {
   },
 };
 
-// Default URLs for testing and related content suggestions
-const DEFAULT_URLS = Object.keys(WEB_CONTENT);
-
-const WebContent = ({
-  url,
-  onClose,
-  onNavigate,
-  onBookmark,
-  isBookmarked: initialBookmarked,
-}) => {
+const WebContent = ({ url, onClose, onNavigate, onBookmark }) => {
   // Error checking for invalid URL
   if (!url) {
     return (
@@ -350,24 +341,20 @@ const WebContent = ({
       </div>
     );
   }
+
   // Get theme configuration
   const themeConfig = useThemeStore((state) => state.themeConfig);
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
+
+  // Get bookmark status from store
+  const isBookmarked = useSearchEngineStore((state) => state.isBookmarked(url));
 
   // Local state
   const [content, setContent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [bookmarked, setBookmarked] = useState(initialBookmarked || false);
   const [visitHistory, setVisitHistory] = useState([]);
   const [currentHistoryIndex, setCurrentHistoryIndex] = useState(0);
-
-  // Update bookmarked state if prop changes
-  useEffect(() => {
-    if (initialBookmarked !== undefined) {
-      setBookmarked(initialBookmarked);
-    }
-  }, [initialBookmarked]);
 
   // Load content when URL changes
   useEffect(() => {
@@ -403,13 +390,7 @@ const WebContent = ({
 
   // Toggle bookmark
   const handleToggleBookmark = () => {
-    const newBookmarkedState = !bookmarked;
-    setBookmarked(newBookmarkedState);
-
-    // Call the parent's bookmark handler if provided
-    if (onBookmark) {
-      onBookmark(url, content?.title || "Untitled Page", newBookmarkedState);
-    }
+    onBookmark(url, content?.title || "Untitled Page");
   };
 
   // Handle back navigation
@@ -602,11 +583,11 @@ const WebContent = ({
           <button
             className={styles.bookmarkButton}
             onClick={handleToggleBookmark}
-            title={bookmarked ? "Remove bookmark" : "Add bookmark"}
+            title={isBookmarked ? "Remove bookmark" : "Add bookmark"}
           >
             <BookmarkPlus
               size={18}
-              className={bookmarked ? styles.bookmarkedIcon : ""}
+              className={isBookmarked ? styles.bookmarkedIcon : ""}
             />
           </button>
           <button className={styles.closeButton} onClick={onClose}>
@@ -651,7 +632,8 @@ const WebContent = ({
         <div className={styles.relatedPages}>
           <h3 className={styles.relatedPagesHeading}>Related Pages</h3>
           <div className={styles.relatedList}>
-            {DEFAULT_URLS.filter((pageUrl) => pageUrl !== url)
+            {Object.keys(WEB_CONTENT)
+              .filter((pageUrl) => pageUrl !== url)
               .slice(0, 3)
               .map((pageUrl, index) => {
                 const pageInfo = WEB_CONTENT[pageUrl];
