@@ -1,144 +1,636 @@
-// components/apps/evidenceBoard/EvidenceBoard.module.scss
 @import "../../../styles/variables.scss";
 @import "../../../styles/mixins.scss";
 
-.container {
+.evidenceBoardContainer {
   width: 100%;
   height: 100%;
   display: flex;
   flex-direction: column;
+  background-color: $cyber-dark-blue;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Main Tabs navigation */
+.mainTabs {
+  display: flex;
   background-color: $cyber-dark-purple;
+  border-bottom: 1px solid $cyber-neon-pink;
+}
+
+.mainTab {
+  padding: 0.75rem 1.25rem;
+  font-family: $font-mono;
+  font-size: 0.875rem;
+  background: none;
+  border: none;
+  color: $cyber-text-light;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: all $transition-standard ease;
+  position: relative;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: $cyber-cyan;
+  }
+
+  &.active {
+    color: $cyber-neon-pink;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: $cyber-neon-pink;
+      box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.7);
+    }
+  }
+}
+
+/* Main content area */
+.content {
+  flex: 1;
   overflow: hidden;
   position: relative;
 }
 
-.controls {
+/* Case Files tab styles */
+.casesContainer {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.casesHeader {
   display: flex;
   justify-content: space-between;
-  padding: 10px;
-  background-color: $cyber-dark-blue;
-  border-bottom: 1px solid $cyber-neon-pink;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid rgba($cyber-neon-pink, 0.3);
+  background-color: rgba($cyber-dark-purple, 0.3);
 }
 
-.controlsLeft,
-.controlsRight {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.controlButton {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  background-color: rgba($cyber-dark-purple, 0.7);
-  border: 1px solid $cyber-neon-pink;
-  border-radius: 2px;
+.casesTitle {
+  font-family: $font-display;
+  font-size: 1.25rem;
   color: $cyber-neon-pink;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-shadow: 0 0 5px rgba($cyber-neon-pink, 0.5);
+  margin: 0;
+}
+
+.caseStatus {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.caseCount {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  font-family: $font-mono;
+  font-size: 0.875rem;
+  color: $cyber-cyan;
+}
+
+.submitButton {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background-color: rgba($cyber-dark-purple, 0.8);
+  border: 1px solid $cyber-neon-pink;
+  color: $cyber-neon-pink;
+  font-family: $font-mono;
+  font-size: 0.875rem;
   cursor: pointer;
   transition: all $transition-standard ease;
 
-  &:hover:not(:disabled) {
-    background-color: rgba($cyber-dark-purple, 0.9);
+  &:hover {
+    background-color: rgba($cyber-neon-pink, 0.2);
     box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
   }
 
-  &:active:not(:disabled) {
-    transform: scale(0.97);
+  &:active {
+    transform: scale(0.98);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-  }
+    border-color: rgba($cyber-neon-pink, 0.3);
 
-  &.active {
-    background-color: rgba($cyber-neon-pink, 0.2);
-    box-shadow: inset 0 0 8px rgba($cyber-neon-pink, 0.5);
-  }
-}
-
-.zoomIndicator {
-  font-family: $font-mono;
-  font-size: 12px;
-  color: $cyber-cyan;
-  margin-left: 6px;
-}
-
-.board {
-  flex: 1;
-  overflow: hidden;
-  position: relative;
-  background-color: rgba($cyber-dark-blue, 0.8);
-  background-image: linear-gradient(
-      rgba($cyber-neon-pink, 0.05) 1px,
-      transparent 1px
-    ),
-    linear-gradient(90deg, rgba($cyber-neon-pink, 0.05) 1px, transparent 1px);
-  background-size: 30px 30px;
-
-  &.dragging {
-    cursor: grabbing;
-  }
-
-  &.connecting {
-    cursor: crosshair;
+    &:hover {
+      background-color: rgba($cyber-dark-purple, 0.8);
+      box-shadow: none;
+    }
   }
 }
 
-.boardContent {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-origin: 0 0;
-  will-change: transform; // Performance optimization
-  transition: transform 0.1s ease;
-}
-
-.connectionModeIndicator {
-  position: absolute;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba($cyber-dark-blue, 0.9);
-  border: 1px solid $cyber-neon-pink;
-  padding: 8px 16px;
-  border-radius: 4px;
+/* Case Tabs */
+.caseTabs {
   display: flex;
-  align-items: center;
-  color: $cyber-neon-pink;
-  gap: 8px;
-  font-family: $font-mono;
-  font-size: 14px;
-  animation: fadeIn 0.3s ease;
-  box-shadow: 0 0 10px rgba($cyber-neon-pink, 0.5);
+  border-bottom: 1px solid rgba($cyber-cyan, 0.3);
+  background-color: rgba($cyber-dark-blue, 0.5);
+  overflow-x: auto;
+
+  @include custom-scrollbar(
+    rgba($cyber-dark-blue, 0.6),
+    rgba($cyber-neon-pink, 0.5)
+  );
+
+  /* Hide scrollbar but allow scrolling */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
 }
 
-.cancelButton {
+.caseTab {
+  padding: 0.75rem 1.25rem;
+  white-space: nowrap;
+  font-family: $font-mono;
+  font-size: 0.9rem;
   background: none;
   border: none;
-  color: $cyber-neon-pink;
+  border-bottom: 2px solid transparent;
+  color: $cyber-text-light;
   cursor: pointer;
   display: flex;
   align-items: center;
-  justify-content: center;
-  padding: 2px;
-  margin-left: 8px;
+  gap: 0.5rem;
+  transition: all $transition-standard ease;
 
   &:hover {
-    color: $cyber-warning-red;
+    background-color: rgba($cyber-dark-purple, 0.5);
+    color: $cyber-cyan;
+  }
+
+  &.active {
+    border-bottom: 2px solid $cyber-cyan;
+    background-color: rgba($cyber-dark-purple, 0.7);
+    color: $cyber-cyan;
+  }
+
+  .completeIcon {
+    color: $cyber-neon-pink;
   }
 }
 
+/* Case Card Detail View */
+.caseCardDetail {
+  flex: 1;
+  display: none;
+  flex-direction: row;
+  padding: 1.5rem;
+  overflow-y: auto;
+
+  @include custom-scrollbar(
+    rgba($cyber-dark-blue, 0.6),
+    rgba($cyber-cyan, 0.5)
+  );
+
+  &.visible {
+    display: flex;
+  }
+}
+
+.caseImage {
+  width: 200px;
+  min-width: 200px;
+  margin-right: 1.5rem;
+}
+
+.caseImagePlaceholder {
+  width: 100%;
+  height: 200px;
+  background-color: rgba($cyber-dark-purple, 0.3);
+  border: 1px solid rgba($cyber-cyan, 0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: $cyber-cyan;
+  opacity: 0.7;
+
+  span {
+    font-family: $font-mono;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+}
+
+.caseDetails {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.descriptionBox {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background-color: rgba($cyber-dark-blue, 0.5);
+  border: 1px solid rgba($cyber-cyan, 0.5);
+  border-radius: 2px;
+}
+
+.descriptionLabel {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: $cyber-cyan;
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  font-size: 1rem;
+  color: $cyber-text-light;
+  line-height: 1.5;
+}
+
+.inputsContainer {
+  flex: 1;
+  margin-bottom: 1rem;
+}
+
+.inputGroup {
+  margin-bottom: 1.25rem;
+}
+
+.inputLabel {
+  display: block;
+  font-size: 0.9rem;
+  color: $cyber-cyan;
+  margin-bottom: 0.375rem;
+}
+
+.inputField {
+  width: 100%;
+  padding: 0.75rem;
+  background-color: rgba($cyber-dark-blue, 0.7);
+  border: 1px solid rgba($cyber-neon-pink, 0.5);
+  color: $cyber-text-light;
+  font-family: $font-content;
+  font-size: 1rem;
+  transition: all $transition-standard ease;
+
+  &:focus {
+    outline: none;
+    border-color: $cyber-neon-pink;
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
+  }
+
+  &::placeholder {
+    color: rgba($cyber-text-light, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    border-color: rgba($cyber-neon-pink, 0.3);
+  }
+}
+
+.notesField {
+  width: 100%;
+  min-height: 100px;
+  padding: 0.75rem;
+  background-color: rgba($cyber-dark-blue, 0.7);
+  border: 1px solid rgba($cyber-neon-pink, 0.5);
+  color: $cyber-text-light;
+  font-family: $font-content;
+  font-size: 1rem;
+  resize: vertical;
+  transition: all $transition-standard ease;
+
+  &:focus {
+    outline: none;
+    border-color: $cyber-neon-pink;
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
+  }
+
+  &::placeholder {
+    color: rgba($cyber-text-light, 0.5);
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+    border-color: rgba($cyber-neon-pink, 0.3);
+  }
+}
+
+.caseNav {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 1rem;
+}
+
+.caseNavButton {
+  padding: 0.5rem 1rem;
+  background-color: rgba($cyber-dark-purple, 0.6);
+  border: 1px solid rgba($cyber-cyan, 0.5);
+  color: $cyber-cyan;
+  font-family: $font-mono;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all $transition-standard ease;
+
+  &:hover {
+    background-color: rgba($cyber-cyan, 0.2);
+    border-color: $cyber-cyan;
+    box-shadow: 0 0 8px rgba($cyber-cyan, 0.3);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+/* Modal styles */
+.modalOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+.modal {
+  width: 90%;
+  max-width: 500px;
+  background-color: $cyber-dark-blue;
+  border: 1px solid $cyber-neon-pink;
+  box-shadow: 0 0 20px rgba($cyber-neon-pink, 0.3);
+  animation: slideIn 0.3s ease;
+}
+
+.modalHeader {
+  padding: 1rem;
+  background-color: rgba($cyber-dark-purple, 0.8);
+  border-bottom: 1px solid $cyber-neon-pink;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h3 {
+    margin: 0;
+    font-family: $font-display;
+    color: $cyber-neon-pink;
+    font-size: 1.2rem;
+  }
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: $cyber-text-light;
+  cursor: pointer;
+  transition: all $transition-standard ease;
+
+  &:hover {
+    color: $cyber-neon-pink;
+    transform: scale(1.1);
+  }
+}
+
+.modalBody {
+  padding: 1.5rem;
+  color: $cyber-text-light;
+  font-size: 0.95rem;
+  line-height: 1.5;
+
+  p {
+    margin-bottom: 1rem;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.caseStatusList {
+  background-color: rgba($cyber-dark-purple, 0.5);
+  border: 1px solid rgba($cyber-cyan, 0.5);
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+.statusItem {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba($cyber-text-light, 0.1);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.statusName {
+  font-weight: medium;
+}
+
+.statusIndicator {
+  font-family: $font-mono;
+  font-size: 0.85rem;
+
+  &.complete {
+    color: $cyber-neon-pink;
+  }
+
+  &.incomplete {
+    color: rgba($cyber-text-light, 0.6);
+  }
+}
+
+.errorMessage {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background-color: rgba($cyber-warning-red, 0.2);
+  border: 1px solid $cyber-warning-red;
+  color: $cyber-warning-red;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+.modalFooter {
+  padding: 1rem;
+  background-color: rgba($cyber-dark-purple, 0.5);
+  border-top: 1px solid rgba($cyber-neon-pink, 0.5);
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.cancelButton,
+.confirmButton,
+.closeResultButton,
+.resetButton {
+  padding: 0.5rem 1rem;
+  font-family: $font-mono;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all $transition-standard ease;
+}
+
+.cancelButton {
+  background-color: transparent;
+  border: 1px solid rgba($cyber-text-light, 0.3);
+  color: $cyber-text-light;
+
+  &:hover {
+    background-color: rgba($cyber-text-light, 0.1);
+    border-color: $cyber-text-light;
+  }
+}
+
+.confirmButton {
+  background-color: rgba($cyber-neon-pink, 0.2);
+  border: 1px solid $cyber-neon-pink;
+  color: $cyber-neon-pink;
+
+  &:hover {
+    background-color: rgba($cyber-neon-pink, 0.3);
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.closeResultButton {
+  background-color: rgba($cyber-cyan, 0.2);
+  border: 1px solid $cyber-cyan;
+  color: $cyber-cyan;
+
+  &:hover {
+    background-color: rgba($cyber-cyan, 0.3);
+    box-shadow: 0 0 8px rgba($cyber-cyan, 0.5);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.resetButton {
+  background-color: transparent;
+  border: 1px solid rgba($cyber-text-light, 0.3);
+  color: $cyber-text-light;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover {
+    background-color: rgba($cyber-text-light, 0.1);
+    border-color: $cyber-text-light;
+  }
+}
+
+/* Results modal specific styles */
+.resultSummary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background-color: rgba($cyber-dark-purple, 0.5);
+  border: 1px solid rgba($cyber-neon-pink, 0.5);
+}
+
+.resultScore {
+  font-family: $font-display;
+  font-size: 2.5rem;
+  color: $cyber-neon-pink;
+  text-shadow: 0 0 10px rgba($cyber-neon-pink, 0.7);
+}
+
+.resultLabel {
+  font-family: $font-mono;
+  font-size: 0.9rem;
+  color: $cyber-text-light;
+  margin-top: 0.5rem;
+}
+
+.resultMessage {
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.successMessage {
+  padding: 1rem;
+  background-color: rgba($cyber-neon-pink, 0.1);
+  border: 1px solid $cyber-neon-pink;
+  color: $cyber-text-light;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.successIcon {
+  font-size: 2rem;
+}
+
+/* Coming soon placeholder for other tabs */
+.comingSoon {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: $cyber-text-light;
+  opacity: 0.6;
+
+  h3 {
+    color: $cyber-neon-pink;
+    font-family: $font-display;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translate(-50%, 10px);
   }
   to {
     opacity: 1;
-    transform: translate(-50%, 0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
   }
 }

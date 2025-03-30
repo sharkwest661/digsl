@@ -1,6 +1,7 @@
 // src/components/apps/terminal/Terminal.jsx
 import React, { useState, useEffect, useRef } from "react";
 import { useThemeStore, useDarkWebStore } from "../../../store";
+import PasswordCracker from "./PasswordCracker";
 import styles from "./Terminal.module.scss";
 
 const Terminal = () => {
@@ -19,10 +20,9 @@ const Terminal = () => {
   // Cracking state
   const [crackingMode, setCrackingMode] = useState(false);
   const [targetSystem, setTargetSystem] = useState("");
-  const [password, setPassword] = useState("");
-  const [attempts, setAttempts] = useState(0);
+  const [targetPassword, setTargetPassword] = useState("");
   const [maxAttempts, setMaxAttempts] = useState(5);
-  const [feedback, setFeedback] = useState("");
+  const [passwordHint, setPasswordHint] = useState("");
   const [isCracked, setIsCracked] = useState(false);
 
   const terminalRef = useRef(null);
@@ -37,7 +37,7 @@ const Terminal = () => {
 
   // Focus input when terminal is clicked
   const focusInput = () => {
-    if (inputRef.current) {
+    if (inputRef.current && !crackingMode) {
       inputRef.current.focus();
     }
   };
@@ -56,16 +56,12 @@ const Terminal = () => {
     setCommandHistory([...commandHistory, input]);
     setHistoryIndex(-1);
 
-    if (crackingMode) {
-      handleCrackAttempt(input);
-    } else {
-      processCommand(input);
-    }
+    processCommand(input);
 
     setInput("");
   };
 
-  // Process regular commands
+  // Process commands
   const processCommand = (cmd) => {
     const args = cmd.trim().split(" ");
     const command = args[0].toLowerCase();
@@ -320,18 +316,22 @@ const Terminal = () => {
       return;
     }
 
-    let targetPassword = "";
+    let passwordToCrack = "";
     let attempts = 0;
+    let hint = "";
 
     if (target.includes("cobra")) {
-      targetPassword = "venom";
+      passwordToCrack = "venom";
       attempts = 5;
+      hint = "Associated with snake venom and network penetration";
     } else if (target.includes("ghost")) {
-      targetPassword = "caduceus";
+      passwordToCrack = "caduceus";
       attempts = 6;
+      hint = "Ancient medical symbol involving snakes and a staff";
     } else if (target.includes("prometheus")) {
-      targetPassword = "fire";
+      passwordToCrack = "fire";
       attempts = 4;
+      hint = "What did Prometheus steal from the gods in Greek mythology?";
     } else {
       addOutput([
         `Unknown target: ${target}`,
@@ -340,105 +340,113 @@ const Terminal = () => {
       return;
     }
 
-    setCrackingMode(true);
+    // Set up cracking mode
     setTargetSystem(target);
-    setPassword(targetPassword);
-    setAttempts(0);
+    setTargetPassword(passwordToCrack);
     setMaxAttempts(attempts);
-    setIsCracked(false);
+    setPasswordHint(hint);
+    setCrackingMode(true);
 
     addOutput([
       `Initiating password cracker for: ${target}`,
       `You have ${attempts} attempts before lockout.`,
-      "Enter password guess:",
+      "Starting password cracking tool...",
     ]);
   };
 
-  // Handle password cracking attempt
-  const handleCrackAttempt = (guess) => {
-    // Add the guess to history
+  // Handle successful password crack
+  const handleCrackSuccess = (password) => {
     addOutput([
-      `Attempt ${attempts + 1}/${maxAttempts}: Testing "${guess}"...`,
+      "ACCESS GRANTED",
+      `Successfully cracked ${targetSystem}!`,
+      "Accessing vendor data...",
+      "-------------------------",
+      `Vendor account unlocked: ${targetSystem}`,
+      "-------------------------",
+    ]);
+    setIsCracked(true);
+
+    // Handle successful crack based on target
+    let vendorId = null;
+
+    if (targetSystem.includes("cobra")) {
+      vendorId = "CobraSystems";
+      addOutput([
+        "=== VENDOR PROFILE: CobraSystems ===",
+        "Real name: Alex Karimov",
+        "Products: Network penetration tools",
+        "Customers: 247 verified transactions",
+        "Last login: 3 days before disappearance",
+        "Notes: Tools compromise user data security",
+        "Evidence item: Circuit board with snake emblem found at scene",
+        "=====================================",
+      ]);
+    } else if (targetSystem.includes("ghost")) {
+      vendorId = "GhostDoc";
+      addOutput([
+        "=== VENDOR PROFILE: GhostDoc ===",
+        "Real name: Dr. Leyla Mahmudova",
+        "Products: Medical credentials, prescription access",
+        "Customers: 183 verified transactions",
+        "Last login: Day of disappearance",
+        "Notes: Sold fraudulent medical licenses",
+        "Evidence item: Antique medical caduceus wrapped in gauze",
+        "=====================================",
+      ]);
+    } else if (targetSystem.includes("prometheus")) {
+      vendorId = "Prometheus_X";
+      addOutput([
+        "=== VENDOR PROFILE: Prometheus_X ===",
+        "Real name: Ibrahim Nasirov",
+        "Products: Industrial sabotage software",
+        "Customers: 92 verified high-value transactions",
+        "Last login: 5 hours before disappearance",
+        'Notes: Quote - "bringing forbidden knowledge to mankind"',
+        "Evidence item: Small metal lighter with Greek lettering",
+        "=====================================",
+      ]);
+    }
+
+    // If vendorId was identified, update the dark web store to unlock vendor
+    if (vendorId) {
+      try {
+        // Use the dark web store to unlock the vendor
+        const darkWebStore = useDarkWebStore.getState();
+
+        // First update the vendor's access status
+        darkWebStore.authenticateAsVendor(vendorId);
+
+        addOutput([
+          `Vendor profile for ${vendorId} has been unlocked in the Shadow Market browser.`,
+          "You can now access their complete vendor profile and transaction history.",
+          "Use 'connect " + targetSystem + "' to access the account directly.",
+        ]);
+      } catch (error) {
+        console.error("Error updating dark web store:", error);
+      }
+    }
+
+    // Exit cracking mode
+    setCrackingMode(false);
+  };
+
+  // Handle password crack failure
+  const handleCrackFailure = () => {
+    addOutput([
+      "ACCESS DENIED",
+      "Maximum attempts reached.",
+      "System locked - further attempts will trigger security alert.",
+      "Try finding more information about the target before retrying.",
     ]);
 
-    setAttempts(attempts + 1);
+    // Exit cracking mode
+    setCrackingMode(false);
+  };
 
-    if (guess === password) {
-      addOutput([
-        "ACCESS GRANTED",
-        `Successfully cracked ${targetSystem}!`,
-        "Accessing vendor data...",
-        "-------------------------",
-        `Vendor account unlocked: ${targetSystem}`,
-        "-------------------------",
-      ]);
-      setCrackingMode(false);
-      setIsCracked(true);
-
-      // Handle successful crack based on target
-      let vendorId = null;
-
-      if (targetSystem.includes("cobra")) {
-        vendorId = "CobraSystems";
-        addOutput([
-          "=== VENDOR PROFILE: CobraSystems ===",
-          "Real name: Alex Karimov",
-          "Products: Network penetration tools",
-          "Customers: 247 verified transactions",
-          "Last login: 3 days before disappearance",
-          "Notes: Tools compromise user data security",
-          "Evidence item: Circuit board with snake emblem found at scene",
-          "=====================================",
-        ]);
-      } else if (targetSystem.includes("ghost")) {
-        vendorId = "GhostDoc";
-        addOutput([
-          "=== VENDOR PROFILE: GhostDoc ===",
-          "Real name: Dr. Leyla Mahmudova",
-          "Products: Medical credentials, prescription access",
-          "Customers: 183 verified transactions",
-          "Last login: Day of disappearance",
-          "Notes: Sold fraudulent medical licenses",
-          "Evidence item: Antique medical caduceus wrapped in gauze",
-          "=====================================",
-        ]);
-      } else if (targetSystem.includes("prometheus")) {
-        vendorId = "Prometheus_X";
-        addOutput([
-          "=== VENDOR PROFILE: Prometheus_X ===",
-          "Real name: Ibrahim Nasirov",
-          "Products: Industrial sabotage software",
-          "Customers: 92 verified high-value transactions",
-          "Last login: 5 hours before disappearance",
-          'Notes: Quote - "bringing forbidden knowledge to mankind"',
-          "Evidence item: Small metal lighter with Greek lettering",
-          "=====================================",
-        ]);
-      }
-
-      // If vendorId was identified, update the dark web store to unlock vendor
-      if (vendorId) {
-        try {
-          // Use the dark web store to unlock the vendor
-          const darkWebStore = useDarkWebStore.getState();
-
-          // First update the vendor's access status
-          darkWebStore.authenticateAsVendor(vendorId);
-
-          addOutput([
-            `Vendor profile for ${vendorId} has been unlocked in the Shadow Market browser.`,
-            "You can now access their complete vendor profile and transaction history.",
-            "Use 'connect " +
-              targetSystem +
-              "' to access the account directly.",
-          ]);
-        } catch (error) {
-          console.error("Error updating dark web store:", error);
-        }
-      }
-
-      return;
-    }
+  // Exit the cracking minigame
+  const handleExitCracking = () => {
+    setCrackingMode(false);
+    addOutput(["Password cracking aborted."]);
   };
 
   // Connect to system
@@ -530,31 +538,44 @@ const Terminal = () => {
         <div className={styles.statusIndicator}>SECURE</div>
       </div>
 
-      <div className={styles.terminalContent} ref={terminalRef}>
-        {history.map((item, index) => (
-          <div
-            key={index}
-            className={`${styles.terminalLine} ${styles[item.type]}`}
-          >
-            {item.text}
-          </div>
-        ))}
-      </div>
-
-      <form onSubmit={handleSubmit} className={styles.inputForm}>
-        <span className={styles.prompt}>
-          {crackingMode ? "password>" : `${currentDir}>`}
-        </span>
-        <input
-          ref={inputRef}
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          onKeyDown={handleKeyDown}
-          className={styles.terminalInput}
-          autoFocus
+      {crackingMode ? (
+        // Render password cracker minigame
+        <PasswordCracker
+          targetPassword={targetPassword}
+          maxAttempts={maxAttempts}
+          onSuccess={handleCrackSuccess}
+          onFailure={handleCrackFailure}
+          onExit={handleExitCracking}
+          hint={passwordHint}
         />
-      </form>
+      ) : (
+        // Render normal terminal
+        <>
+          <div className={styles.terminalContent} ref={terminalRef}>
+            {history.map((item, index) => (
+              <div
+                key={index}
+                className={`${styles.terminalLine} ${styles[item.type]}`}
+              >
+                {item.text}
+              </div>
+            ))}
+          </div>
+
+          <form onSubmit={handleSubmit} className={styles.inputForm}>
+            <span className={styles.prompt}>{`${currentDir}>`}</span>
+            <input
+              ref={inputRef}
+              type="text"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              className={styles.terminalInput}
+              autoFocus
+            />
+          </form>
+        </>
+      )}
     </div>
   );
 };
