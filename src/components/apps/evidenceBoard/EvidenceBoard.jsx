@@ -1,21 +1,20 @@
 // components/apps/evidenceBoard/EvidenceBoard.jsx
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState } from "react";
 import {
-  Plus,
-  Minus,
-  Link2,
-  Link2Off,
-  Trash,
-  X,
-  PenTool,
+  Clipboard,
+  Edit,
+  Save,
   FileText,
-  FilePlus,
+  X,
+  ChevronRight,
+  Check,
+  RotateCcw,
+  Send,
+  Layers,
+  CheckCircle,
 } from "lucide-react";
-import { useEvidenceBoardStore, useThemeStore } from "../../../store";
-import EvidenceItem from "./EvidenceItem";
-import Connections from "./Connections";
-import EditEvidenceModal from "./EditEvidenceModal";
-import ConfirmationModal from "../../common/ConfirmationModal";
+import { useThemeStore, useEvidenceBoardStore } from "../../../store";
+import { Scanlines } from "../../effects/Scanlines";
 import styles from "./EvidenceBoard.module.scss";
 
 const EvidenceBoard = () => {
@@ -23,362 +22,420 @@ const EvidenceBoard = () => {
   const themeConfig = useThemeStore((state) => state.themeConfig);
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
 
-  // Get evidence store state and actions
-  const evidence = useEvidenceBoardStore((state) => state.evidence);
-  const connections = useEvidenceBoardStore((state) => state.connections);
-  const selectedEvidenceId = useEvidenceBoardStore(
-    (state) => state.selectedEvidenceId
+  // Get evidence board state
+  const caseCards = useEvidenceBoardStore((state) => state.caseCards);
+  const updateCaseCard = useEvidenceBoardStore((state) => state.updateCaseCard);
+  const submitInvestigation = useEvidenceBoardStore(
+    (state) => state.submitInvestigation
   );
-  const isConnectingMode = useEvidenceBoardStore(
-    (state) => state.isConnectingMode
+  const resetInvestigation = useEvidenceBoardStore(
+    (state) => state.resetInvestigation
   );
-  const connectingFrom = useEvidenceBoardStore((state) => state.connectingFrom);
-  const zoomLevel = useEvidenceBoardStore((state) => state.zoomLevel);
-  const panOffset = useEvidenceBoardStore((state) => state.panOffset);
-
-  const selectEvidence = useEvidenceBoardStore((state) => state.selectEvidence);
-  const moveEvidence = useEvidenceBoardStore((state) => state.moveEvidence);
-  const startConnecting = useEvidenceBoardStore(
-    (state) => state.startConnecting
+  const investigationSubmitted = useEvidenceBoardStore(
+    (state) => state.investigationSubmitted
   );
-  const cancelConnecting = useEvidenceBoardStore(
-    (state) => state.cancelConnecting
-  );
-  const removeEvidence = useEvidenceBoardStore((state) => state.removeEvidence);
-  const addEvidence = useEvidenceBoardStore((state) => state.addEvidence);
-  const updateEvidence = useEvidenceBoardStore((state) => state.updateEvidence);
-  const setZoomLevel = useEvidenceBoardStore((state) => state.setZoomLevel);
-  const setPanOffset = useEvidenceBoardStore((state) => state.setPanOffset);
-
-  // Local state
-  const [isDraggingBoard, setIsDraggingBoard] = useState(false);
-  const [dragStartPosition, setDragStartPosition] = useState({ x: 0, y: 0 });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [temporaryConnector, setTemporaryConnector] = useState(null);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-
-  // References
-  const boardRef = useRef(null);
-
-  // Selected evidence item
-  const selectedEvidence = evidence.find(
-    (item) => item.id === selectedEvidenceId
-  );
-  const connectingEvidence = evidence.find(
-    (item) => item.id === connectingFrom
+  const investigationResult = useEvidenceBoardStore(
+    (state) => state.investigationResult
   );
 
-  // Setup event cleanup
-  useEffect(() => {
-    // Clean up event listeners on unmount
-    return () => {
-      document.removeEventListener("mousemove", handleBoardDrag);
-      document.removeEventListener("mouseup", handleBoardDragEnd);
-    };
-  }, []);
+  // Local UI state
+  const [mainTab, setMainTab] = useState("cases"); // "cases" or "evidence" or "connections"
+  const [selectedCase, setSelectedCase] = useState("snake"); // Default to first case
+  const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [submitError, setSubmitError] = useState("");
+  const [showResultModal, setShowResultModal] = useState(false);
 
-  // Setup event listeners
-  useEffect(() => {
-    const board = boardRef.current;
-    if (board) {
-      board.addEventListener("mousemove", handleBoardMouseMove);
-    }
-
-    // Cleanup
-    return () => {
-      if (board) {
-        board.removeEventListener("mousemove", handleBoardMouseMove);
-      }
-      window.removeEventListener("mousemove", handleBoardDrag);
-      window.removeEventListener("mouseup", handleBoardDragEnd);
-    };
-  }, [isConnectingMode, connectingEvidence, zoomLevel, panOffset]);
-
-  // Handle board click (deselect evidence)
-  const handleBoardClick = (e) => {
-    if (e.target === boardRef.current) {
-      // If in connecting mode, cancel it
-      if (isConnectingMode) {
-        cancelConnecting();
-      } else {
-        selectEvidence(null);
-      }
-    }
+  // Handle case card field update
+  const handleFieldUpdate = (cardId, field, value) => {
+    updateCaseCard(cardId, { [field]: value });
   };
 
-  // Handle board mouse down (start dragging the board)
-  const handleBoardMouseDown = (e) => {
-    if (e.target === boardRef.current) {
-      setIsDraggingBoard(true);
-      setDragStartPosition({ x: e.clientX, y: e.clientY });
+  // Handle investigation submission
+  const handleSubmitInvestigation = () => {
+    // Check if all cards are filled
+    const allCardsFilled = caseCards.every(
+      (card) =>
+        card.realName.trim() !== "" &&
+        card.alias.trim() !== "" &&
+        card.crime.trim() !== ""
+    );
 
-      // Add document-level event listeners for dragging
-      document.addEventListener("mousemove", handleBoardDrag);
-      document.addEventListener("mouseup", handleBoardDragEnd);
+    if (!allCardsFilled) {
+      setSubmitError(
+        "All fields must be filled out for all case cards before submission."
+      );
+      return;
+    }
+
+    // Submit the investigation
+    const result = submitInvestigation();
+
+    if (result.success) {
+      setShowSubmitModal(false);
+      setShowResultModal(true);
+    } else {
+      setSubmitError(result.message);
     }
   };
 
-  // Handle board dragging
-  const handleBoardDrag = (e) => {
-    if (isDraggingBoard) {
-      // Calculate new pan offset
-      const dx = e.clientX - dragStartPosition.x;
-      const dy = e.clientY - dragStartPosition.y;
-
-      setPanOffset({
-        x: panOffset.x + dx,
-        y: panOffset.y + dy,
-      });
-
-      setDragStartPosition({ x: e.clientX, y: e.clientY });
-    }
+  const handleResetInvestigation = () => {
+    resetInvestigation();
+    setShowResultModal(false);
   };
 
-  // Handle ending board drag
-  const handleBoardDragEnd = () => {
-    setIsDraggingBoard(false);
-
-    // Remove document-level event listeners
-    document.removeEventListener("mousemove", handleBoardDrag);
-    document.removeEventListener("mouseup", handleBoardDragEnd);
+  // Check if a case is complete
+  const isCaseComplete = (card) => {
+    return card.realName && card.alias && card.crime;
   };
 
-  // Handle mouse move on the board (for temporary connector)
-  const handleBoardMouseMove = (e) => {
-    // Only handle in connecting mode
-    if (isConnectingMode && connectingEvidence) {
-      const boardRect = boardRef.current.getBoundingClientRect();
-
-      // Convert screen coordinates to board coordinates
-      const toPoint = {
-        x: (e.clientX - boardRect.left - panOffset.x) / zoomLevel,
-        y: (e.clientY - boardRect.top - panOffset.y) / zoomLevel,
-      };
-
-      setTemporaryConnector({
-        from: connectingEvidence.id,
-        fromPosition: connectingEvidence.position,
-        toPosition: toPoint,
-      });
-    }
+  // Count how many cases are complete
+  const getCompleteCount = () => {
+    return caseCards.filter((card) => isCaseComplete(card)).length;
   };
 
-  // Handle mouse up (stop dragging)
-  const handleMouseUp = () => {
-    setIsDraggingBoard(false);
-  };
+  // Render the cases tab with nested case tabs
+  const renderCasesTab = () => (
+    <div className={styles.casesContainer}>
+      {/* Case Files Header */}
+      <div className={styles.casesHeader}>
+        <h2 className={styles.casesTitle}>
+          <Clipboard size={18} />
+          Case Files
+        </h2>
 
-  // Add new evidence
-  const handleAddEvidence = (evidenceData) => {
-    addEvidence(evidenceData);
-    setShowAddModal(false);
-  };
-
-  // Update existing evidence
-  const handleEditEvidence = (updates) => {
-    if (selectedEvidenceId) {
-      updateEvidence(selectedEvidenceId, updates);
-      setShowEditModal(false);
-    }
-  };
-
-  // Zoom in
-  const handleZoomIn = () => {
-    setZoomLevel(zoomLevel + 0.1);
-  };
-
-  // Zoom out
-  const handleZoomOut = () => {
-    setZoomLevel(zoomLevel - 0.1);
-  };
-
-  // Delete selected evidence
-  const handleDeleteEvidence = () => {
-    if (selectedEvidenceId) {
-      removeEvidence(selectedEvidenceId);
-      setShowDeleteModal(false);
-    }
-  };
-
-  // Toggle connection mode
-  const handleToggleConnectMode = () => {
-    if (isConnectingMode) {
-      cancelConnecting();
-    } else if (selectedEvidenceId) {
-      startConnecting(selectedEvidenceId);
-    }
-  };
-
-  // Setup document-wide event listeners
-  useEffect(() => {
-    document.addEventListener("mouseup", handleMouseUp);
-    return () => {
-      document.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, []);
-
-  // Board transform style based on zoom and pan - optimized for performance
-  const boardTransformStyle = {
-    transform: `scale(${zoomLevel}) translate3d(${panOffset.x / zoomLevel}px, ${
-      panOffset.y / zoomLevel
-    }px, 0)`,
-    willChange: "transform",
-  };
-
-  return (
-    <div className={styles.container}>
-      {/* Controls */}
-      <div className={styles.controls}>
-        <div className={styles.controlsLeft}>
-          <button
-            className={styles.controlButton}
-            onClick={() => setShowAddModal(true)}
-            title="Add Evidence"
-          >
-            <FilePlus size={16} />
-          </button>
+        <div className={styles.caseStatus}>
+          <span className={styles.caseCount}>
+            <CheckCircle size={14} />
+            {getCompleteCount()}/5 Complete
+          </span>
 
           <button
-            className={styles.controlButton}
-            onClick={handleZoomIn}
-            disabled={zoomLevel >= 2}
-            title="Zoom In"
+            className={styles.submitButton}
+            onClick={() => setShowSubmitModal(true)}
+            disabled={investigationSubmitted}
           >
-            <Plus size={16} />
+            <Send size={16} />
+            Submit Investigation
           </button>
+        </div>
+      </div>
 
+      {/* Case Tabs Navigation */}
+      <div className={styles.caseTabs}>
+        {caseCards.map((card) => (
           <button
-            className={styles.controlButton}
-            onClick={handleZoomOut}
-            disabled={zoomLevel <= 0.5}
-            title="Zoom Out"
+            key={card.id}
+            className={`${styles.caseTab} ${
+              selectedCase === card.id ? styles.active : ""
+            }`}
+            onClick={() => setSelectedCase(card.id)}
           >
-            <Minus size={16} />
+            <span className={styles.caseTabLabel}>{card.label}</span>
+            {isCaseComplete(card) && (
+              <Check size={12} className={styles.completeIcon} />
+            )}
           </button>
+        ))}
+      </div>
 
-          <div className={styles.zoomIndicator}>
-            {Math.round(zoomLevel * 100)}%
+      {/* Selected Case Card */}
+      {caseCards.map((card) => (
+        <div
+          key={card.id}
+          className={`${styles.caseCardDetail} ${
+            selectedCase === card.id ? styles.visible : ""
+          }`}
+        >
+          <div className={styles.caseImage}>
+            {/* This would be where an image would go in a full implementation */}
+            <div className={styles.caseImagePlaceholder}>
+              <Layers size={40} />
+              <span>{card.label}</span>
+            </div>
+          </div>
+
+          <div className={styles.caseDetails}>
+            <div className={styles.descriptionBox}>
+              <div className={styles.descriptionLabel}>Evidence Found:</div>
+              <div className={styles.description}>{card.description}</div>
+            </div>
+
+            <div className={styles.inputsContainer}>
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Real Name:</label>
+                <input
+                  type="text"
+                  className={styles.inputField}
+                  value={card.realName}
+                  onChange={(e) =>
+                    handleFieldUpdate(card.id, "realName", e.target.value)
+                  }
+                  placeholder="Enter victim's real name"
+                  disabled={investigationSubmitted}
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Dark Web Alias:</label>
+                <input
+                  type="text"
+                  className={styles.inputField}
+                  value={card.alias}
+                  onChange={(e) =>
+                    handleFieldUpdate(card.id, "alias", e.target.value)
+                  }
+                  placeholder="Enter dark web vendor name"
+                  disabled={investigationSubmitted}
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Criminal Activity:</label>
+                <input
+                  type="text"
+                  className={styles.inputField}
+                  value={card.crime}
+                  onChange={(e) =>
+                    handleFieldUpdate(card.id, "crime", e.target.value)
+                  }
+                  placeholder="Enter illegal activity/product"
+                  disabled={investigationSubmitted}
+                />
+              </div>
+
+              <div className={styles.inputGroup}>
+                <label className={styles.inputLabel}>Notes (optional):</label>
+                <textarea
+                  className={styles.notesField}
+                  value={card.notes}
+                  onChange={(e) =>
+                    handleFieldUpdate(card.id, "notes", e.target.value)
+                  }
+                  placeholder="Additional case notes..."
+                  disabled={investigationSubmitted}
+                />
+              </div>
+            </div>
+
+            <div className={styles.caseNav}>
+              <button
+                className={styles.caseNavButton}
+                onClick={() => {
+                  const currentIndex = caseCards.findIndex(
+                    (c) => c.id === card.id
+                  );
+                  const prevIndex =
+                    (currentIndex - 1 + caseCards.length) % caseCards.length;
+                  setSelectedCase(caseCards[prevIndex].id);
+                }}
+              >
+                Previous Case
+              </button>
+
+              <button
+                className={styles.caseNavButton}
+                onClick={() => {
+                  const currentIndex = caseCards.findIndex(
+                    (c) => c.id === card.id
+                  );
+                  const nextIndex = (currentIndex + 1) % caseCards.length;
+                  setSelectedCase(caseCards[nextIndex].id);
+                }}
+              >
+                Next Case
+              </button>
+            </div>
           </div>
         </div>
+      ))}
 
-        <div className={styles.controlsRight}>
-          {selectedEvidenceId && (
-            <>
+      {/* Submit Modal */}
+      {showSubmitModal && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3>Submit Investigation</h3>
               <button
-                className={`${styles.controlButton} ${
-                  isConnectingMode ? styles.active : ""
-                }`}
-                onClick={handleToggleConnectMode}
-                title={
-                  isConnectingMode ? "Cancel Connection" : "Connect Evidence"
-                }
+                className={styles.closeButton}
+                onClick={() => setShowSubmitModal(false)}
               >
-                {isConnectingMode ? (
-                  <Link2Off size={16} />
-                ) : (
-                  <Link2 size={16} />
-                )}
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              <p>
+                You are about to submit your complete investigation of all five
+                victims. This action will lock in your deductions and cannot be
+                undone.
+              </p>
+
+              <div className={styles.caseStatusList}>
+                {caseCards.map((card) => (
+                  <div key={card.id} className={styles.statusItem}>
+                    <span className={styles.statusName}>{card.label}:</span>
+                    <span
+                      className={`${styles.statusIndicator} ${
+                        isCaseComplete(card)
+                          ? styles.complete
+                          : styles.incomplete
+                      }`}
+                    >
+                      {isCaseComplete(card) ? "Complete" : "Incomplete"}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {submitError && (
+                <div className={styles.errorMessage}>{submitError}</div>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.cancelButton}
+                onClick={() => setShowSubmitModal(false)}
+              >
+                Cancel
               </button>
 
               <button
-                className={styles.controlButton}
-                onClick={() => setShowEditModal(true)}
-                title="Edit Evidence"
+                className={styles.confirmButton}
+                onClick={handleSubmitInvestigation}
               >
-                <PenTool size={16} />
+                Submit Investigation
               </button>
-
-              <button
-                className={styles.controlButton}
-                onClick={() => setShowDeleteModal(true)}
-                title="Delete Evidence"
-              >
-                <Trash size={16} />
-              </button>
-            </>
-          )}
+            </div>
+          </div>
         </div>
+      )}
+
+      {/* Results Modal */}
+      {showResultModal && investigationResult && (
+        <div className={styles.modalOverlay}>
+          <div className={styles.modal}>
+            <div className={styles.modalHeader}>
+              <h3>Investigation Results</h3>
+              <button
+                className={styles.closeButton}
+                onClick={() => setShowResultModal(false)}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div className={styles.modalBody}>
+              <div className={styles.resultSummary}>
+                <div className={styles.resultScore}>
+                  {investigationResult.correctCards} /{" "}
+                  {investigationResult.totalCards}
+                </div>
+                <div className={styles.resultLabel}>
+                  Correct Identifications
+                </div>
+              </div>
+
+              <div className={styles.resultMessage}>
+                {investigationResult.message}
+              </div>
+
+              {investigationResult.correctCards === 5 && (
+                <div className={styles.successMessage}>
+                  <div className={styles.successIcon}>🎮</div>
+                  <div>You've completed the game! Congratulations!</div>
+                </div>
+              )}
+            </div>
+
+            <div className={styles.modalFooter}>
+              <button
+                className={styles.resetButton}
+                onClick={handleResetInvestigation}
+              >
+                <RotateCcw size={14} />
+                Reset Investigation
+              </button>
+
+              <button
+                className={styles.closeResultButton}
+                onClick={() => setShowResultModal(false)}
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+
+  // Render the evidence collection tab (placeholder for now)
+  const renderEvidenceTab = () => (
+    <div className={styles.evidenceContainer}>
+      <div className={styles.comingSoon}>
+        <h3>Evidence Collection</h3>
+        <p>This feature is not yet implemented.</p>
+        <p>Use the Case Files tab to track your investigation.</p>
+      </div>
+    </div>
+  );
+
+  // Render the connections tab (placeholder for now)
+  const renderConnectionsTab = () => (
+    <div className={styles.connectionsContainer}>
+      <div className={styles.comingSoon}>
+        <h3>Connection Mapping</h3>
+        <p>This feature is not yet implemented.</p>
+        <p>Use the Case Files tab to track your investigation.</p>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className={styles.evidenceBoardContainer}>
+      {/* Main navigation tabs */}
+      <div className={styles.mainTabs}>
+        <button
+          className={`${styles.mainTab} ${
+            mainTab === "cases" ? styles.active : ""
+          }`}
+          onClick={() => setMainTab("cases")}
+        >
+          <Clipboard size={16} />
+          Case Files
+        </button>
+
+        <button
+          className={`${styles.mainTab} ${
+            mainTab === "evidence" ? styles.active : ""
+          }`}
+          onClick={() => setMainTab("evidence")}
+        >
+          <FileText size={16} />
+          Evidence
+        </button>
+
+        <button
+          className={`${styles.mainTab} ${
+            mainTab === "connections" ? styles.active : ""
+          }`}
+          onClick={() => setMainTab("connections")}
+        >
+          <ChevronRight size={16} />
+          Connections
+        </button>
       </div>
 
-      {/* Evidence Board */}
-      <div
-        className={`${styles.board} ${isDraggingBoard ? styles.dragging : ""} ${
-          isConnectingMode ? styles.connecting : ""
-        }`}
-        onClick={handleBoardClick}
-        onMouseDown={handleBoardMouseDown}
-        onMouseMove={isConnectingMode ? handleBoardMouseMove : undefined}
-        ref={boardRef}
-      >
-        <div className={styles.boardContent} style={boardTransformStyle}>
-          {/* Connection lines */}
-          <Connections
-            connections={connections}
-            evidence={evidence}
-            temporaryConnector={temporaryConnector}
-          />
-
-          {/* Evidence items */}
-          {evidence.map((item) => (
-            <EvidenceItem
-              key={item.id}
-              evidence={item}
-              selected={item.id === selectedEvidenceId}
-              connecting={isConnectingMode && item.id !== connectingFrom}
-              isConnectingSource={item.id === connectingFrom}
-              onSelect={() => selectEvidence(item.id)}
-              onMove={(position) => moveEvidence(item.id, position)}
-              zoomLevel={zoomLevel}
-            />
-          ))}
-        </div>
+      {/* Content area */}
+      <div className={styles.content}>
+        {mainTab === "cases" && renderCasesTab()}
+        {mainTab === "evidence" && renderEvidenceTab()}
+        {mainTab === "connections" && renderConnectionsTab()}
       </div>
 
-      {/* Connection mode indicator */}
-      {isConnectingMode && (
-        <div className={styles.connectionModeIndicator}>
-          <Link2 size={16} />
-          <span>Connecting from: {connectingEvidence?.title}</span>
-          <button onClick={cancelConnecting} className={styles.cancelButton}>
-            <X size={16} />
-          </button>
-        </div>
-      )}
-
-      {/* Modals */}
-      {showAddModal && (
-        <EditEvidenceModal
-          isOpen={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSave={handleAddEvidence}
-          title="Add Evidence"
-        />
-      )}
-
-      {showEditModal && selectedEvidence && (
-        <EditEvidenceModal
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          evidence={selectedEvidence}
-          onSave={handleEditEvidence}
-          title="Edit Evidence"
-        />
-      )}
-
-      {showDeleteModal && (
-        <ConfirmationModal
-          isOpen={showDeleteModal}
-          onClose={() => setShowDeleteModal(false)}
-          onConfirm={handleDeleteEvidence}
-          title="Delete Evidence"
-          message={`Are you sure you want to delete "${
-            selectedEvidence?.title || "this evidence"
-          }"? This action cannot be undone.`}
-          confirmText="Delete"
-        />
-      )}
+      {/* Scanline effect if enabled */}
+      {effectsEnabled?.scanlines && <Scanlines opacity={0.1} />}
     </div>
   );
 };

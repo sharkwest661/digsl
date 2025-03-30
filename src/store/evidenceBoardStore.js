@@ -1,102 +1,300 @@
 // store/evidenceBoardStore.js
 import { create } from "zustand";
 
+// Define the correct answers for verification
+const CORRECT_ANSWERS = {
+  snake: {
+    realName: "Alex Karimov",
+    alias: "CobraSystems",
+    crime: "Network penetration tools that compromise user data",
+  },
+  medical: {
+    realName: "Dr. Leyla Mahmudova",
+    alias: "GhostDoc",
+    crime: "Medical credentials and prescription access",
+  },
+  lighter: {
+    realName: "Ibrahim Nasirov",
+    alias: "Prometheus_X",
+    crime: "Industrial sabotage software and restricted technical documents",
+  },
+  usb: {
+    realName: "Unknown", // Player won't be able to solve this yet
+    alias: "QuantumHarvest",
+    crime: "Mass data harvesting and selling personal information",
+  },
+  mirror: {
+    realName: "Unknown", // Player won't be able to solve this yet
+    alias: "MirrorMask",
+    crime: "Identity theft and impersonation services",
+  },
+};
+
+// Define the case cards
+const INITIAL_CASE_CARDS = [
+  {
+    id: "snake",
+    label: "Snake Body",
+    description:
+      "Body found with a small toy snake wrapped around a circuit board",
+    realName: "",
+    alias: "",
+    crime: "",
+    notes: "",
+    isSubmitted: false,
+  },
+  {
+    id: "medical",
+    label: "Medical Symbol Body",
+    description:
+      "Body found with an antique medical caduceus with gauze wrapped around it",
+    realName: "",
+    alias: "",
+    crime: "",
+    notes: "",
+    isSubmitted: false,
+  },
+  {
+    id: "lighter",
+    label: "Lighter Body",
+    description: "Body found with a small metal lighter with Greek lettering",
+    realName: "",
+    alias: "",
+    crime: "",
+    notes: "",
+    isSubmitted: false,
+  },
+  {
+    id: "usb",
+    label: "USB Body",
+    description:
+      "Body found with a USB drive embedded in a small sheaf of wheat",
+    realName: "",
+    alias: "",
+    crime: "",
+    notes: "",
+    isSubmitted: false,
+  },
+  {
+    id: "mirror",
+    label: "Mirror Body",
+    description: "Body found with a small mirror with text etched backward",
+    realName: "",
+    alias: "",
+    crime: "",
+    notes: "",
+    isSubmitted: false,
+  },
+];
+
+// Save state to localStorage
+const saveToLocalStorage = (
+  caseCards,
+  evidence,
+  connections,
+  investigationSubmitted,
+  investigationResult
+) => {
+  try {
+    localStorage.setItem(
+      "shadow_market_evidence_board",
+      JSON.stringify({
+        caseCards,
+        evidence,
+        connections,
+        investigationSubmitted,
+        investigationResult,
+      })
+    );
+  } catch (error) {
+    console.error("Error saving evidence board state to localStorage:", error);
+  }
+};
+
+// Load state from localStorage
+const loadFromLocalStorage = () => {
+  try {
+    const savedState = localStorage.getItem("shadow_market_evidence_board");
+    if (savedState) {
+      return JSON.parse(savedState);
+    }
+  } catch (error) {
+    console.error(
+      "Error loading evidence board state from localStorage:",
+      error
+    );
+  }
+  return null;
+};
+
+// For evidence items
 const generateId = () =>
   `evidence-${Date.now()}-${Math.floor(Math.random() * 10000)}`;
 
-// Save evidence to localStorage
-const saveEvidenceToLocalStorage = (evidence, connections) => {
-  try {
-    localStorage.setItem(
-      "shadow_market_evidence",
-      JSON.stringify({ evidence, connections })
-    );
-  } catch (error) {
-    console.error("Error saving evidence to localStorage:", error);
-  }
-};
-
-// Load evidence from localStorage
-const loadEvidenceFromLocalStorage = () => {
-  try {
-    const savedEvidence = localStorage.getItem("shadow_market_evidence");
-    if (savedEvidence) {
-      return JSON.parse(savedEvidence);
-    }
-  } catch (error) {
-    console.error("Error loading evidence from localStorage:", error);
-  }
-
-  // Return default evidence if nothing is saved
-  return {
-    evidence: [
-      {
-        id: "evidence-welcome",
-        title: "Investigation Start",
-        description:
-          "Begin your investigation by collecting evidence and connecting related items. Use the add button to create new evidence cards.",
-        type: "note",
-        position: { x: 100, y: 100 },
-        color: "cyan",
-        pinned: true,
-      },
-      {
-        id: "evidence-objects",
-        title: "Objects Left at Crime Scenes",
-        description:
-          "Each victim was found with a distinctive object - these might relate to their online identity.",
-        type: "document",
-        position: { x: 400, y: 150 },
-        color: "pink",
-        pinned: false,
-      },
-      {
-        id: "evidence-cobra",
-        title: "Toy snake on circuit board",
-        description:
-          "Found with the first victim. Matches CobraSystems' avatar icon on Shadow Market.",
-        type: "item",
-        position: { x: 350, y: 300 },
-        color: "orange",
-        pinned: false,
-      },
-    ],
-    connections: [
-      {
-        id: "conn-1",
-        from: "evidence-objects",
-        to: "evidence-cobra",
-        label: "Example",
-        color: "cyan",
-      },
-    ],
-  };
-};
-
 const useEvidenceBoardStore = create((set, get) => {
-  // Load initial state from localStorage
-  const { evidence: initialEvidence, connections: initialConnections } =
-    loadEvidenceFromLocalStorage();
+  // Load saved state or use initial state
+  const savedState = loadFromLocalStorage();
 
-  return {
-    // Evidence items
-    evidence: initialEvidence,
+  const initialState = {
+    // Case cards for victim identification
+    caseCards: savedState?.caseCards || INITIAL_CASE_CARDS,
 
-    // Connections between evidence items
-    connections: initialConnections,
+    // Traditional evidence collection (kept for compatibility)
+    evidence: savedState?.evidence || [],
+    connections: savedState?.connections || [],
 
-    // Currently selected evidence for editing or connecting
+    // Investigation submission state
+    investigationSubmitted: savedState?.investigationSubmitted || false,
+    investigationResult: savedState?.investigationResult || null,
+
+    // UI state
+    selectedCardId: null,
     selectedEvidenceId: null,
-
-    // Connection mode (when creating connections between evidence)
-    connectingFrom: null,
     isConnectingMode: false,
-
-    // Current view settings
+    connectingFrom: null,
     zoomLevel: 1,
     panOffset: { x: 0, y: 0 },
+  };
 
-    // Add new evidence item
+  return {
+    ...initialState,
+
+    // Update a case card field
+    updateCaseCard: (cardId, updates) => {
+      set((state) => {
+        const updatedCards = state.caseCards.map((card) =>
+          card.id === cardId ? { ...card, ...updates } : card
+        );
+
+        saveToLocalStorage(
+          updatedCards,
+          state.evidence,
+          state.connections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
+
+        return { caseCards: updatedCards };
+      });
+    },
+
+    // Select a card for editing
+    selectCard: (cardId) => {
+      set({ selectedCardId: cardId });
+    },
+
+    // Submit the entire investigation (all 5 cards)
+    submitInvestigation: () => {
+      const { caseCards } = get();
+
+      // Check if all cards have been filled out
+      const allCardsFilled = caseCards.every(
+        (card) =>
+          card.realName.trim() !== "" &&
+          card.alias.trim() !== "" &&
+          card.crime.trim() !== ""
+      );
+
+      if (!allCardsFilled) {
+        return {
+          success: false,
+          message:
+            "All case cards must be completely filled out before submission.",
+        };
+      }
+
+      // Count correct answers
+      let correctCount = 0;
+
+      caseCards.forEach((card) => {
+        const correctData = CORRECT_ANSWERS[card.id];
+
+        // Case-insensitive matching for text fields
+        const isRealNameCorrect =
+          card.realName.toLowerCase() === correctData.realName.toLowerCase();
+        const isAliasCorrect =
+          card.alias.toLowerCase() === correctData.alias.toLowerCase();
+
+        // More flexible matching for crime description
+        const isCrimeCorrect =
+          correctData.crime.toLowerCase().includes(card.crime.toLowerCase()) ||
+          card.crime.toLowerCase().includes(correctData.crime.toLowerCase());
+
+        if (isRealNameCorrect && isAliasCorrect && isCrimeCorrect) {
+          correctCount++;
+        }
+      });
+
+      // Determine result based on correct count
+      let result = {
+        totalCards: 5,
+        correctCards: correctCount,
+        message: "",
+        success: false,
+      };
+
+      if (correctCount === 5) {
+        result.success = true;
+        result.message =
+          "Excellent work, Detective! Your deductions are spot on. You've correctly identified all victims and their activities. Something terrible happened in Shadow Market, and you might be the only one who knows the full story now...";
+      } else if (correctCount >= 3) {
+        result.success = false;
+        result.message =
+          "You're on the right track. You've correctly identified some of the victims, but there are still errors in your deductions. Review the evidence again and look for overlooked connections.";
+      } else {
+        result.success = false;
+        result.message =
+          "Your investigation has stalled. Most of your deductions are incorrect. Return to the evidence and reconsider your approach. The connections are there if you look carefully.";
+      }
+
+      // Update state with results
+      set((state) => {
+        const updatedState = {
+          investigationSubmitted: true,
+          investigationResult: result,
+        };
+
+        saveToLocalStorage(
+          state.caseCards,
+          state.evidence,
+          state.connections,
+          true,
+          result
+        );
+
+        return updatedState;
+      });
+
+      return {
+        success: true,
+        message: "Investigation submitted for review.",
+      };
+    },
+
+    // Reset the investigation
+    resetInvestigation: () => {
+      set((state) => {
+        const resetCards = INITIAL_CASE_CARDS;
+
+        saveToLocalStorage(
+          resetCards,
+          state.evidence,
+          state.connections,
+          false,
+          null
+        );
+
+        return {
+          caseCards: resetCards,
+          investigationSubmitted: false,
+          investigationResult: null,
+        };
+      });
+    },
+
+    // --- Traditional evidence board functions ---
+
+    // Add evidence item (kept for compatibility)
     addEvidence: (evidence) => {
       const newEvidence = {
         id: generateId(),
@@ -108,7 +306,15 @@ const useEvidenceBoardStore = create((set, get) => {
 
       set((state) => {
         const updatedEvidence = [...state.evidence, newEvidence];
-        saveEvidenceToLocalStorage(updatedEvidence, state.connections);
+
+        saveToLocalStorage(
+          state.caseCards,
+          updatedEvidence,
+          state.connections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
+
         return { evidence: updatedEvidence };
       });
 
@@ -121,7 +327,15 @@ const useEvidenceBoardStore = create((set, get) => {
         const updatedEvidence = state.evidence.map((item) =>
           item.id === id ? { ...item, ...updates } : item
         );
-        saveEvidenceToLocalStorage(updatedEvidence, state.connections);
+
+        saveToLocalStorage(
+          state.caseCards,
+          updatedEvidence,
+          state.connections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
+
         return { evidence: updatedEvidence };
       });
     },
@@ -136,7 +350,13 @@ const useEvidenceBoardStore = create((set, get) => {
           (conn) => conn.from !== id && conn.to !== id
         );
 
-        saveEvidenceToLocalStorage(updatedEvidence, updatedConnections);
+        saveToLocalStorage(
+          state.caseCards,
+          updatedEvidence,
+          updatedConnections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
 
         return {
           evidence: updatedEvidence,
@@ -166,7 +386,15 @@ const useEvidenceBoardStore = create((set, get) => {
         const updatedEvidence = state.evidence.map((item) =>
           item.id === id ? { ...item, position } : item
         );
-        saveEvidenceToLocalStorage(updatedEvidence, state.connections);
+
+        saveToLocalStorage(
+          state.caseCards,
+          updatedEvidence,
+          state.connections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
+
         return { evidence: updatedEvidence };
       });
     },
@@ -201,7 +429,14 @@ const useEvidenceBoardStore = create((set, get) => {
           };
 
           const updatedConnections = [...state.connections, newConnection];
-          saveEvidenceToLocalStorage(state.evidence, updatedConnections);
+
+          saveToLocalStorage(
+            state.caseCards,
+            state.evidence,
+            updatedConnections,
+            state.investigationSubmitted,
+            state.investigationResult
+          );
 
           return { connections: updatedConnections };
         });
@@ -214,7 +449,15 @@ const useEvidenceBoardStore = create((set, get) => {
         const updatedConnections = state.connections.map((conn) =>
           conn.id === id ? { ...conn, ...updates } : conn
         );
-        saveEvidenceToLocalStorage(state.evidence, updatedConnections);
+
+        saveToLocalStorage(
+          state.caseCards,
+          state.evidence,
+          updatedConnections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
+
         return { connections: updatedConnections };
       });
     },
@@ -225,7 +468,15 @@ const useEvidenceBoardStore = create((set, get) => {
         const updatedConnections = state.connections.filter(
           (conn) => conn.id !== id
         );
-        saveEvidenceToLocalStorage(state.evidence, updatedConnections);
+
+        saveToLocalStorage(
+          state.caseCards,
+          state.evidence,
+          updatedConnections,
+          state.investigationSubmitted,
+          state.investigationResult
+        );
+
         return { connections: updatedConnections };
       });
     },
@@ -244,10 +495,25 @@ const useEvidenceBoardStore = create((set, get) => {
 
     // Reset evidence board to initial state
     resetEvidenceBoard: () => {
-      const defaultState = loadEvidenceFromLocalStorage();
+      const defaultState = {
+        caseCards: INITIAL_CASE_CARDS,
+        evidence: [],
+        connections: [],
+        investigationSubmitted: false,
+        investigationResult: null,
+      };
+
+      saveToLocalStorage(
+        defaultState.caseCards,
+        defaultState.evidence,
+        defaultState.connections,
+        defaultState.investigationSubmitted,
+        defaultState.investigationResult
+      );
+
       set({
-        evidence: defaultState.evidence,
-        connections: defaultState.connections,
+        ...defaultState,
+        selectedCardId: null,
         selectedEvidenceId: null,
         connectingFrom: null,
         isConnectingMode: false,
