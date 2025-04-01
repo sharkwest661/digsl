@@ -3,10 +3,10 @@ import React from "react";
 import styles from "./PasswordCracker.module.scss";
 
 /**
- * Component to display character-by-character feedback for password attempts
+ * Component to display symbol-by-symbol feedback for password attempts
  *
  * @param {Object} props - Component props
- * @param {Array} props.feedback - Array of feedback items with char and status
+ * @param {Array} props.feedback - Array of feedback items with symbol and status
  */
 const PasswordFeedback = ({ feedback = [] }) => {
   if (!feedback || feedback.length === 0) {
@@ -18,10 +18,10 @@ const PasswordFeedback = ({ feedback = [] }) => {
       {feedback.map((item, index) => (
         <div
           key={index}
-          className={`${styles.feedbackChar} ${styles[item.status]}`}
+          className={`${styles.feedbackSymbol} ${styles[item.status]}`}
           title={getStatusDescription(item.status)}
         >
-          {item.char}
+          {item.symbol}
         </div>
       ))}
     </div>
@@ -32,11 +32,11 @@ const PasswordFeedback = ({ feedback = [] }) => {
 const getStatusDescription = (status) => {
   switch (status) {
     case "correct":
-      return "Correct character in correct position";
+      return "Correct symbol in the correct position";
     case "partial":
-      return "Correct character in wrong position";
+      return "Correct symbol in the wrong position";
     case "incorrect":
-      return "Incorrect character";
+      return "Incorrect symbol";
     default:
       return "";
   }

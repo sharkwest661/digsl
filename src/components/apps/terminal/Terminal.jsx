@@ -1,30 +1,55 @@
 // src/components/apps/terminal/Terminal.jsx
 import React, { useState, useEffect, useRef } from "react";
-import { useThemeStore, useDarkWebStore } from "../../../store";
+import {
+  useThemeStore,
+  useDarkWebStore,
+  useTerminalStore,
+} from "../../../store";
 import PasswordCracker from "./PasswordCracker";
 import styles from "./Terminal.module.scss";
 
 const Terminal = () => {
+  // Selectively pick only the theme properties we need
   const themeConfig = useThemeStore((state) => state.themeConfig);
   const effectsEnabled = useThemeStore((state) => state.effectsEnabled);
 
-  // Terminal state
+  // Selectively get terminal state properties using separate selectors
+  const history = useTerminalStore((state) => state.history);
+  const currentDir = useTerminalStore((state) => state.currentDir);
+  const crackingMode = useTerminalStore((state) => state.crackingMode);
+  const targetSystem = useTerminalStore((state) => state.targetSystem);
+  const targetPassword = useTerminalStore((state) => state.targetPassword);
+  const maxAttempts = useTerminalStore((state) => state.maxAttempts);
+  const passwordHint = useTerminalStore((state) => state.passwordHint);
+  const crackedVendors = useTerminalStore((state) => state.crackedVendors);
+
+  // Selectively get terminal actions
+  const addToHistory = useTerminalStore((state) => state.addToHistory);
+  const addOutput = useTerminalStore((state) => state.addOutput);
+  const addCommandToHistory = useTerminalStore(
+    (state) => state.addCommandToHistory
+  );
+  const clearTerminal = useTerminalStore((state) => state.clearTerminal);
+  const setCurrentDir = useTerminalStore((state) => state.setCurrentDir);
+  const navigateCommandHistory = useTerminalStore(
+    (state) => state.navigateCommandHistory
+  );
+  const getCurrentCommandFromHistory = useTerminalStore(
+    (state) => state.getCurrentCommandFromHistory
+  );
+  const setCrackingMode = useTerminalStore((state) => state.setCrackingMode);
+  const setupPasswordCracking = useTerminalStore(
+    (state) => state.setupPasswordCracking
+  );
+  const setVendorCracked = useTerminalStore((state) => state.setVendorCracked);
+  const resetCrackingState = useTerminalStore(
+    (state) => state.resetCrackingState
+  );
+
+  // Local component state for user input
   const [input, setInput] = useState("");
-  const [history, setHistory] = useState([
-    { text: "Shadow OS Terminal v1.3.37", type: "system" },
-  ]);
-  const [commandHistory, setCommandHistory] = useState([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const [currentDir, setCurrentDir] = useState("/home/investigator");
 
-  // Cracking state
-  const [crackingMode, setCrackingMode] = useState(false);
-  const [targetSystem, setTargetSystem] = useState("");
-  const [targetPassword, setTargetPassword] = useState("");
-  const [maxAttempts, setMaxAttempts] = useState(5);
-  const [passwordHint, setPasswordHint] = useState("");
-  const [isCracked, setIsCracked] = useState(false);
-
+  // References
   const terminalRef = useRef(null);
   const inputRef = useRef(null);
 
@@ -48,16 +73,13 @@ const Terminal = () => {
 
     if (!input.trim()) return;
 
-    // Add command to history
-    const newLine = { text: `${currentDir}> ${input}`, type: "command" };
-    setHistory([...history, newLine]);
+    // Add command to history via the store
+    addCommandToHistory(input);
 
-    // Add to command history for up/down arrows
-    setCommandHistory([...commandHistory, input]);
-    setHistoryIndex(-1);
-
+    // Process the command
     processCommand(input);
 
+    // Clear input field
     setInput("");
   };
 
@@ -83,7 +105,7 @@ const Terminal = () => {
         break;
 
       case "clear":
-        setHistory([{ text: "Terminal cleared.", type: "system" }]);
+        clearTerminal();
         break;
 
       case "ls":
@@ -165,8 +187,9 @@ const Terminal = () => {
       const parts = currentDir.split("/");
       if (parts.length > 2) {
         parts.pop();
-        setCurrentDir(parts.join("/"));
-        addOutput([`Changed directory to ${parts.join("/")}`]);
+        const newDir = parts.join("/");
+        setCurrentDir(newDir);
+        addOutput([`Changed directory to ${newDir}`]);
       } else {
         addOutput(["Already at root directory"]);
       }
@@ -230,7 +253,7 @@ const Terminal = () => {
         "1. First run a scan on the target: scan [url]",
         "2. Then attempt to crack: crack [url]",
         "3. You will have limited attempts based on security level",
-        "4. Each guess will provide feedback on correct characters",
+        "4. Each guess will provide feedback on correct symbols",
         "",
         "Password hints may be found in evidence or vendor descriptions.",
         "Good luck and stay undetected.",
@@ -288,13 +311,13 @@ const Terminal = () => {
         results = [
           "SCAN COMPLETE:",
           "Target: prometheus.shadowmarket.onion",
-          "Security Level: VERY HIGH",
+          "Security Level: LOW",
           "Open Ports: 80, 443, 8080",
           "Vulnerabilities: Limited login attempts",
           "Username identified: Prometheus_X",
           "Password required for access.",
           'Hint: Vendor quote - "bringing forbidden knowledge to mankind"',
-          "Password attempts allowed: 4",
+          "Password attempts allowed: 7",
         ];
       } else {
         results = [
@@ -316,22 +339,52 @@ const Terminal = () => {
       return;
     }
 
-    let passwordToCrack = "";
+    // Check if this vendor is already cracked
+    const vendorId = target.includes("cobra")
+      ? "cobra"
+      : target.includes("ghost")
+      ? "ghost"
+      : target.includes("prometheus")
+      ? "prometheus"
+      : null;
+
+    if (vendorId && crackedVendors[vendorId]) {
+      addOutput([
+        `System already cracked: ${target}`,
+        `You have full access to this vendor's account.`,
+        `Use 'connect ${target}' to access the system.`,
+      ]);
+      return;
+    }
+
+    let passwordSymbols = [];
     let attempts = 0;
+    let difficulty = "medium";
     let hint = "";
+    let vendorName = "";
 
     if (target.includes("cobra")) {
-      passwordToCrack = "venom";
-      attempts = 5;
-      hint = "Associated with snake venom and network penetration";
+      // Use 6 symbols for CobraSystems (hard)
+      passwordSymbols = ["Ω", "λ", "Ω", "φ", "β", "γ"]; // Example password: ΩλΩφβγ
+      attempts = 5; // Fewer attempts for hard difficulty
+      difficulty = "hard";
+      hint =
+        "Password contains repeating symbols. Related to network protocols.";
+      vendorName = "CobraSystems";
     } else if (target.includes("ghost")) {
-      passwordToCrack = "caduceus";
-      attempts = 6;
-      hint = "Ancient medical symbol involving snakes and a staff";
+      // Use 5 symbols for GhostDoc (medium)
+      passwordSymbols = ["π", "∑", "∆", "λ", "φ"]; // Example password: π∑∆λφ
+      attempts = 6; // Medium attempts
+      difficulty = "medium";
+      hint = "Password related to medical symbols";
+      vendorName = "GhostDoc";
     } else if (target.includes("prometheus")) {
-      passwordToCrack = "fire";
-      attempts = 4;
-      hint = "What did Prometheus steal from the gods in Greek mythology?";
+      // Use 4 symbols for Prometheus_X (easy)
+      passwordSymbols = ["Ω", "π", "∆", "λ"]; // Example password: Ωπ∆λ
+      attempts = 7; // More attempts for easy difficulty
+      difficulty = "easy";
+      hint = "Related to Greek mythology";
+      vendorName = "Prometheus_X";
     } else {
       addOutput([
         `Unknown target: ${target}`,
@@ -340,15 +393,13 @@ const Terminal = () => {
       return;
     }
 
-    // Set up cracking mode
-    setTargetSystem(target);
-    setTargetPassword(passwordToCrack);
-    setMaxAttempts(attempts);
-    setPasswordHint(hint);
-    setCrackingMode(true);
+    // Set up cracking mode via the store
+    setupPasswordCracking(target, passwordSymbols, attempts, hint);
 
     addOutput([
       `Initiating password cracker for: ${target}`,
+      `Target identified: ${vendorName}`,
+      `Security level: ${difficulty.toUpperCase()}`,
       `You have ${attempts} attempts before lockout.`,
       "Starting password cracking tool...",
     ]);
@@ -364,13 +415,12 @@ const Terminal = () => {
       `Vendor account unlocked: ${targetSystem}`,
       "-------------------------",
     ]);
-    setIsCracked(true);
 
     // Handle successful crack based on target
     let vendorId = null;
 
     if (targetSystem.includes("cobra")) {
-      vendorId = "CobraSystems";
+      vendorId = "cobra";
       addOutput([
         "=== VENDOR PROFILE: CobraSystems ===",
         "Real name: Alex Karimov",
@@ -382,7 +432,7 @@ const Terminal = () => {
         "=====================================",
       ]);
     } else if (targetSystem.includes("ghost")) {
-      vendorId = "GhostDoc";
+      vendorId = "ghost";
       addOutput([
         "=== VENDOR PROFILE: GhostDoc ===",
         "Real name: Dr. Leyla Mahmudova",
@@ -394,7 +444,7 @@ const Terminal = () => {
         "=====================================",
       ]);
     } else if (targetSystem.includes("prometheus")) {
-      vendorId = "Prometheus_X";
+      vendorId = "prometheus";
       addOutput([
         "=== VENDOR PROFILE: Prometheus_X ===",
         "Real name: Ibrahim Nasirov",
@@ -407,17 +457,28 @@ const Terminal = () => {
       ]);
     }
 
-    // If vendorId was identified, update the dark web store to unlock vendor
+    // Mark vendor as cracked in our store
     if (vendorId) {
-      try {
-        // Use the dark web store to unlock the vendor
-        const darkWebStore = useDarkWebStore.getState();
+      // Update the terminal store
+      setVendorCracked(vendorId);
 
-        // First update the vendor's access status
-        darkWebStore.authenticateAsVendor(vendorId);
+      try {
+        // Get the dark web store state management functions
+        const authenticateAsVendor = useDarkWebStore(
+          (state) => state.authenticateAsVendor
+        );
+
+        // Update the vendor's access status
+        authenticateAsVendor(
+          vendorId === "cobra"
+            ? "CobraSystems"
+            : vendorId === "ghost"
+            ? "GhostDoc"
+            : "Prometheus_X"
+        );
 
         addOutput([
-          `Vendor profile for ${vendorId} has been unlocked in the Shadow Market browser.`,
+          `Vendor profile has been unlocked in the Shadow Market browser.`,
           "You can now access their complete vendor profile and transaction history.",
           "Use 'connect " + targetSystem + "' to access the account directly.",
         ]);
@@ -440,12 +501,12 @@ const Terminal = () => {
     ]);
 
     // Exit cracking mode
-    setCrackingMode(false);
+    resetCrackingState();
   };
 
   // Exit the cracking minigame
   const handleExitCracking = () => {
-    setCrackingMode(false);
+    resetCrackingState();
     addOutput(["Password cracking aborted."]);
   };
 
@@ -464,18 +525,13 @@ const Terminal = () => {
 
     setTimeout(() => {
       let result = [];
+      const vendorId = system.includes("cobra")
+        ? "cobra"
+        : system.includes("ghost")
+        ? "ghost"
+        : "prometheus";
 
-      if (
-        (system.includes("cobra") &&
-          isCracked &&
-          targetSystem.includes("cobra")) ||
-        (system.includes("ghost") &&
-          isCracked &&
-          targetSystem.includes("ghost")) ||
-        (system.includes("prometheus") &&
-          isCracked &&
-          targetSystem.includes("prometheus"))
-      ) {
+      if (crackedVendors[vendorId]) {
         result = [
           "CONNECTION ESTABLISHED",
           `Successfully connected to ${system}`,
@@ -495,39 +551,23 @@ const Terminal = () => {
     }, 1500);
   };
 
-  // Add output to terminal history
-  const addOutput = (lines) => {
-    const newLines = lines.map((line) => ({ text: line, type: "output" }));
-    setHistory((prev) => [...prev, ...newLines]);
-  };
-
   // Handle key press for command history navigation
   const handleKeyDown = (e) => {
     // Up arrow
     if (e.keyCode === 38) {
       e.preventDefault();
-
-      if (
-        commandHistory.length > 0 &&
-        historyIndex < commandHistory.length - 1
-      ) {
-        const newIndex = historyIndex + 1;
-        setHistoryIndex(newIndex);
-        setInput(commandHistory[commandHistory.length - 1 - newIndex]);
+      navigateCommandHistory("up");
+      const historyCommand = getCurrentCommandFromHistory();
+      if (historyCommand) {
+        setInput(historyCommand);
       }
     }
     // Down arrow
     else if (e.keyCode === 40) {
       e.preventDefault();
-
-      if (historyIndex > 0) {
-        const newIndex = historyIndex - 1;
-        setHistoryIndex(newIndex);
-        setInput(commandHistory[commandHistory.length - 1 - newIndex]);
-      } else if (historyIndex === 0) {
-        setHistoryIndex(-1);
-        setInput("");
-      }
+      navigateCommandHistory("down");
+      const historyCommand = getCurrentCommandFromHistory();
+      setInput(historyCommand || "");
     }
   };
 
@@ -547,6 +587,22 @@ const Terminal = () => {
           onFailure={handleCrackFailure}
           onExit={handleExitCracking}
           hint={passwordHint}
+          difficulty={
+            targetSystem.includes("cobra")
+              ? "hard"
+              : targetSystem.includes("ghost")
+              ? "medium"
+              : "easy"
+          }
+          vendorName={
+            targetSystem.includes("cobra")
+              ? "CobraSystems"
+              : targetSystem.includes("ghost")
+              ? "GhostDoc"
+              : targetSystem.includes("prometheus")
+              ? "Prometheus_X"
+              : "Unknown"
+          }
         />
       ) : (
         // Render normal terminal
