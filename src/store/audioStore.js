@@ -1,5 +1,6 @@
 // store/audioStore.js
 import { create } from "zustand";
+import { PLAYLIST_DATA } from "../constants/musicData";
 
 // Audio store to manage audio playback
 const useAudioStore = create((set, get) => ({
@@ -15,6 +16,9 @@ const useAudioStore = create((set, get) => ({
 
   // Audio element reference
   audioElement: null,
+
+  // Playlist data
+  playlist: [],
 
   // Initialize audio (this will be called once from App.jsx)
   initAudio: () => {
@@ -42,27 +46,46 @@ const useAudioStore = create((set, get) => ({
 
       // Store in state
       set({ audioElement: audio });
+
+      // Load initial playlist if empty
+      if (get().playlist.length === 0) {
+        get().setPlaylist(PLAYLIST_DATA);
+      } else {
+        // Ensure current track is loaded
+        const currentIndex = get().currentTrackIndex;
+        const currentPlaylist = get().playlist;
+        if (currentPlaylist.length > currentIndex) {
+          audio.src = currentPlaylist[currentIndex].file;
+          audio.load();
+        }
+      }
     }
   },
-
-  // Playlist data
-  playlist: [],
 
   // Set playlist
   setPlaylist: (playlist) => {
     set({ playlist });
+
     // Load first track if nothing is loaded
-    if (get().audioElement && !get().audioElement.src && playlist.length > 0) {
-      get().audioElement.src = playlist[0].file;
-      get().audioElement.load();
+    const audioElement = get().audioElement;
+    if (audioElement && playlist.length > 0) {
+      // Always load the first track when setting playlist
+      audioElement.src = playlist[0].file;
+      audioElement.load();
     }
   },
 
   // Play/pause toggle
   togglePlay: () => {
-    const { isPlaying, audioElement } = get();
+    const { isPlaying, audioElement, playlist, currentTrackIndex } = get();
 
     if (!audioElement) return;
+
+    // If there's no source set but we have a playlist, set the source
+    if (!audioElement.src && playlist.length > 0) {
+      audioElement.src = playlist[currentTrackIndex].file;
+      audioElement.load();
+    }
 
     if (isPlaying) {
       audioElement.pause();

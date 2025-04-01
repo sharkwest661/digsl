@@ -15,6 +15,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { useThemeStore, useAudioStore } from "../../../store";
+import { PLAYLIST_DATA } from "../../../constants/musicData";
 import styles from "./MusicPlayer.module.scss";
 
 const MusicPlayer = () => {
@@ -32,16 +33,18 @@ const MusicPlayer = () => {
   const currentTime = useAudioStore((state) => state.currentTime);
   const seekTo = useAudioStore((state) => state.seekTo);
   const playlist = useAudioStore((state) => state.playlist);
+  const setPlaylist = useAudioStore((state) => state.setPlaylist);
   const favorites = useAudioStore((state) => state.favorites);
   const toggleFavorite = useAudioStore((state) => state.toggleFavorite);
   const isFavorite = useAudioStore((state) => state.isFavorite);
-  const cleanup = useAudioStore((state) => state.cleanup);
+  const initAudio = useAudioStore((state) => state.initAudio);
 
   // Local state
   const [progress, setProgress] = useState(0);
   const [selectedView, setSelectedView] = useState("player"); // 'player' or 'playlist'
   const [previousVolume, setPreviousVolume] = useState(40);
   const [visualizerData, setVisualizerData] = useState([]);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   const visualizerRef = useRef(null);
 
@@ -50,10 +53,48 @@ const MusicPlayer = () => {
     "--progress-percent": `${progress}%`,
   };
 
-  // Initialize visualizer
+  // Initialize audio player when component mounts
   useEffect(() => {
+    // Initialize audio element
+    initAudio();
+
+    // Set playlist if it's empty
+    if (playlist.length === 0) {
+      setPlaylist(PLAYLIST_DATA);
+    }
+
+    // Initialize visualizer
     generateVisualizerData();
-  }, []);
+
+    // Mark as initialized
+    setIsInitialized(true);
+
+    // Cleanup function when component unmounts
+    return () => {
+      // We don't call cleanup() here because we want to keep playing when minimized
+      // The cleanup will be handled by windowsStore when the window is fully closed
+    };
+  }, [initAudio, setPlaylist, playlist]);
+
+  // Handle first track when play button is pressed
+  const handlePlay = () => {
+    // If we have a playlist but no track is selected, choose the first one
+    if (
+      playlist.length > 0 &&
+      currentTrackIndex === 0 &&
+      currentTime === 0 &&
+      !isPlaying
+    ) {
+      // Ensure the first track is loaded before playing
+      changeTrack(0);
+      // Wait a tiny bit to ensure track is loaded
+      setTimeout(() => {
+        togglePlay();
+      }, 50);
+    } else {
+      togglePlay();
+    }
+  };
 
   // Generate new visualizer data
   const generateVisualizerData = () => {
@@ -86,10 +127,6 @@ const MusicPlayer = () => {
       setProgress(0);
     }
   }, [currentTime, duration]);
-
-  const handlePlay = () => {
-    togglePlay();
-  };
 
   const handleNext = () => {
     const nextIndex = (currentTrackIndex + 1) % playlist.length;
