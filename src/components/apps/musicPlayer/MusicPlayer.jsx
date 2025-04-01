@@ -12,6 +12,7 @@ import {
   Music,
   Heart,
   HeartOff,
+  RefreshCw,
 } from "lucide-react";
 import { useThemeStore, useAudioStore } from "../../../store";
 import styles from "./MusicPlayer.module.scss";
@@ -34,6 +35,7 @@ const MusicPlayer = () => {
   const favorites = useAudioStore((state) => state.favorites);
   const toggleFavorite = useAudioStore((state) => state.toggleFavorite);
   const isFavorite = useAudioStore((state) => state.isFavorite);
+  const cleanup = useAudioStore((state) => state.cleanup);
 
   // Local state
   const [progress, setProgress] = useState(0);

@@ -12,6 +12,7 @@ import { useDarkWebStore } from "./darkWebStore";
 import { useEvidenceBoardStore } from "./evidenceBoardStore";
 import { useDatabaseStore, DATABASE_TYPES } from "./databaseStore";
 import { useSearchEngineStore } from "./searchEngineStore";
+import terminalStore from "./terminalStore";
 
 // Export all stores and constants
 export {
@@ -45,4 +46,7 @@ export {
 
   // Search Engine store
   useSearchEngineStore,
+
+  // Terminal store
+  terminalStore as useTerminalStore,
 };

@@ -44,7 +44,7 @@ import SearchEngine from "../../apps/searchEngine";
 const APP_COMPONENTS = {
   [APP_TYPES.MUSIC_PLAYER]: MusicPlayer,
   [APP_TYPES.NOTEPAD]: Notepad,
-  [APP_TYPES.HACKING_TOOL]: TerminalApp,
+  [APP_TYPES.TERMINAL_APP]: TerminalApp,
   [APP_TYPES.DARK_WEB]: DarkWebBrowser,
   [APP_TYPES.EVIDENCE_BOARD]: EvidenceBoard,
   [APP_TYPES.DATABASE]: DatabaseSearch,
@@ -90,7 +90,7 @@ const desktopApps = [
     icon: <Folder size={24} />,
   },
   {
-    id: APP_TYPES.HACKING_TOOL,
+    id: APP_TYPES.TERMINAL_APP,
     title: "Terminal",
     icon: <Terminal size={24} />,
   },

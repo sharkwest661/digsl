@@ -11,13 +11,13 @@ const APP_TYPES = {
   NOTEPAD: "notepad",
   FILE_EXPLORER: "fileExplorer",
   MUSIC_PLAYER: "musicPlayer",
-  HACKING_TOOL: "hackingTool",
+  TERMINAL_APP: "terminalApp",
 };
 
 // Theme associations for each app
 const APP_THEMES = {
   [APP_TYPES.DARK_WEB]: "darkHacker",
-  [APP_TYPES.HACKING_TOOL]: "darkHacker",
+  [APP_TYPES.TERMINAL_APP]: "darkHacker",
   [APP_TYPES.DATABASE]: "darkHacker", // Assuming we want database to use hacker theme
   // All other apps will use default cyberpunk theme if not specified
 };
@@ -32,7 +32,7 @@ const DEFAULT_POSITIONS = {
   [APP_TYPES.NOTEPAD]: { x: 160, y: 160, width: 750, height: 600 },
   [APP_TYPES.FILE_EXPLORER]: { x: 180, y: 180, width: 600, height: 450 },
   [APP_TYPES.MUSIC_PLAYER]: { x: 200, y: 200, width: 350, height: 580 },
-  [APP_TYPES.HACKING_TOOL]: { x: 220, y: 220, width: 650, height: 500 },
+  [APP_TYPES.TERMINAL_APP]: { x: 220, y: 220, width: 650, height: 500 },
 };
 
 // Create the windows store
@@ -91,7 +91,21 @@ const useWindowsStore = create((set, get) => ({
 
   // Close a window
   closeWindow: (windowId) => {
-    const window = get().windows.find((w) => w.id === windowId);
+    const { windows } = get();
+    const window = windows.find((w) => w.id === windowId);
+
+    // Special handling for music player - do a FULL cleanup when closing
+    if (window && window.appType === APP_TYPES.MUSIC_PLAYER) {
+      import("./audioStore")
+        .then((module) => {
+          const audioStore = module.useAudioStore.getState();
+          // Call full cleanup (reset all state)
+          audioStore.cleanup();
+        })
+        .catch((error) => {
+          console.error("Failed to import audioStore:", error);
+        });
+    }
 
     set((state) => {
       // Filter out the closed window
@@ -117,22 +131,6 @@ const useWindowsStore = create((set, get) => ({
         activeWindowId: activeId,
       };
     });
-
-    // Special handling for music player - pause music when window is closed
-    // This is added to fix the issue of music continuing to play when the player is closed
-    if (window && window.appType === APP_TYPES.MUSIC_PLAYER) {
-      // Use dynamic import to avoid circular dependency issues
-      import("./audioStore")
-        .then((module) => {
-          const audioStore = module.useAudioStore.getState();
-          if (audioStore.isPlaying) {
-            audioStore.togglePlay(); // Pause the music
-          }
-        })
-        .catch((error) => {
-          console.error("Failed to import audioStore:", error);
-        });
-    }
   },
 
   // Set a window as active (bring to front)
@@ -181,6 +179,21 @@ const useWindowsStore = create((set, get) => ({
 
       // Toggle minimize state
       const isMinimized = !window.isMinimized;
+
+      // Special handling for music player when minimizing
+      if (window.appType === APP_TYPES.MUSIC_PLAYER && isMinimized) {
+        // Only pause the music when minimizing, don't reset state
+        import("./audioStore")
+          .then((module) => {
+            const audioStore = module.useAudioStore.getState();
+            if (audioStore.isPlaying) {
+              audioStore.togglePlay(); // Just pause on minimize
+            }
+          })
+          .catch((error) => {
+            console.error("Failed to import audioStore:", error);
+          });
+      }
 
       // Update windows
       const updatedWindows = state.windows.map((w) =>
@@ -238,7 +251,7 @@ const useWindowsStore = create((set, get) => ({
 
   // Close all windows
   closeAllWindows: () => {
-    // Check if music player is open and pause it
+    // Check if music player is open and call cleanup
     const musicPlayerWindow = get().windows.find(
       (w) => w.appType === APP_TYPES.MUSIC_PLAYER
     );
@@ -246,9 +259,7 @@ const useWindowsStore = create((set, get) => ({
       import("./audioStore")
         .then((module) => {
           const audioStore = module.useAudioStore.getState();
-          if (audioStore.isPlaying) {
-            audioStore.togglePlay(); // Pause the music
-          }
+          audioStore.cleanup(); // Full cleanup when closing
         })
         .catch((error) => {
           console.error("Failed to import audioStore:", error);
