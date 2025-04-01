@@ -10,6 +10,8 @@ import {
   Terminal,
   Clipboard,
   Search,
+  FileQuestion,
+  FileLock,
 } from "lucide-react";
 import {
   useWindowsStore,
@@ -25,20 +27,10 @@ import TerminalApp from "../../apps/terminal";
 import Taskbar from "../Taskbar";
 import DarkWebBrowser from "../../apps/darkWeb";
 import EvidenceBoard from "../../apps/evidenceBoard";
-import styles from "./Desktop.module.scss";
-
-// Import app components - these will be loaded dynamically based on window type
-// For now we're just including a placeholder for each app
-const AppPlaceholder = ({ appType }) => (
-  <div className={styles.appPlaceholder}>
-    <h2 className={styles.appTitle}>App: {appType}</h2>
-    <p>This is a placeholder for the {appType} application</p>
-  </div>
-);
-
-// Import Database component
 import DatabaseSearch from "../../apps/database";
 import SearchEngine from "../../apps/searchEngine";
+import TextViewer from "../../apps/textViewer";
+import styles from "./Desktop.module.scss";
 
 // Map of app types to components
 const APP_COMPONENTS = {
@@ -48,56 +40,81 @@ const APP_COMPONENTS = {
   [APP_TYPES.DARK_WEB]: DarkWebBrowser,
   [APP_TYPES.EVIDENCE_BOARD]: EvidenceBoard,
   [APP_TYPES.DATABASE]: DatabaseSearch,
-  [APP_TYPES.SEARCH_ENGINE]: SearchEngine, // Placeholder for Search Engine
-  // Other app types will be filled in later
+  [APP_TYPES.SEARCH_ENGINE]: SearchEngine,
+  [APP_TYPES.TEXT_VIEWER]: TextViewer,
 };
 
 // Desktop app definitions
 const desktopApps = [
+  // Text files with special handling
   {
-    id: APP_TYPES.MUSIC_PLAYER,
+    id: "readme-file",
+    title: "README.txt",
+    icon: <FileQuestion size={24} />,
+    appType: APP_TYPES.TEXT_VIEWER,
+    props: { fileId: "readme" },
+  },
+  {
+    id: "darkweb-file",
+    title: "DarkWeb_Access.txt",
+    icon: <FileLock size={24} />,
+    appType: APP_TYPES.TEXT_VIEWER,
+    props: { fileId: "access-instructions" },
+  },
+  // Regular applications
+  {
+    id: "music-player",
     title: "Music",
     icon: <Music size={24} />,
+    appType: APP_TYPES.MUSIC_PLAYER,
   },
   {
-    id: APP_TYPES.DARK_WEB,
+    id: "dark-web",
     title: "Dark Web",
     icon: <Globe size={24} />,
+    appType: APP_TYPES.DARK_WEB,
   },
   {
-    id: APP_TYPES.DATABASE,
+    id: "database",
     title: "Database",
     icon: <Database size={24} />,
+    appType: APP_TYPES.DATABASE,
   },
   {
-    id: APP_TYPES.SEARCH_ENGINE,
+    id: "search-engine",
     title: "Search",
     icon: <Search size={24} />,
+    appType: APP_TYPES.SEARCH_ENGINE,
   },
   {
-    id: APP_TYPES.EMAIL,
+    id: "email",
     title: "Email",
     icon: <Mail size={24} />,
+    appType: APP_TYPES.EMAIL,
   },
   {
-    id: APP_TYPES.NOTEPAD,
+    id: "notepad",
     title: "Notepad",
     icon: <FileText size={24} />,
+    appType: APP_TYPES.NOTEPAD,
   },
   {
-    id: APP_TYPES.FILE_EXPLORER,
+    id: "file-explorer",
     title: "Files",
     icon: <Folder size={24} />,
+    appType: APP_TYPES.FILE_EXPLORER,
   },
   {
-    id: APP_TYPES.TERMINAL_APP,
+    id: "terminal",
     title: "Terminal",
     icon: <Terminal size={24} />,
+    appType: APP_TYPES.TERMINAL_APP,
   },
   {
-    id: APP_TYPES.EVIDENCE_BOARD,
+    id: "evidence",
     title: "Evidence",
     icon: <Clipboard size={24} />,
+    appType: APP_TYPES.EVIDENCE_BOARD,
   },
 ];
 
@@ -144,23 +161,23 @@ const Desktop = () => {
   }, [allWindows, previousWindows, isPlaying, togglePlay]);
 
   // Handle single click on icon (select)
-  const handleIconClick = (appType) => {
-    setSelectedIcon(selectedIcon === appType ? null : appType);
+  const handleIconClick = (appId) => {
+    setSelectedIcon(selectedIcon === appId ? null : appId);
   };
 
   // Handle double click on icon (open)
-  const handleIconDoubleClick = (appType, title) => {
+  const handleIconDoubleClick = (app) => {
     // Check if app is already open
     const existingWindow = allWindows.find(
-      (window) => window.appType === appType
+      (window) => window.appType === app.appType
     );
 
     if (existingWindow) {
       // Focus existing window
       setActiveWindow(existingWindow.id);
     } else {
-      // Open new window
-      openWindow(appType, title);
+      // Open new window with props if provided
+      openWindow(app.appType, app.title, app.props || {});
     }
   };
 
@@ -185,7 +202,7 @@ const Desktop = () => {
         {desktopApps.map((app) => {
           // Check if this app has an open window
           const isActive = allWindows.some(
-            (window) => window.appType === app.id
+            (window) => window.appType === app.appType
           );
           const isHovered = hoveredIcon === app.id;
           const isSelected = selectedIcon === app.id;
@@ -203,7 +220,7 @@ const Desktop = () => {
               }}
               onDoubleClick={(e) => {
                 e.stopPropagation(); // Prevent desktop click handler
-                handleIconDoubleClick(app.id, app.title);
+                handleIconDoubleClick(app);
               }}
               onMouseEnter={() => setHoveredIcon(app.id)}
               onMouseLeave={() => setHoveredIcon(null)}
@@ -227,7 +244,14 @@ const Desktop = () => {
           // Determine which component to render
           const AppComponent =
             APP_COMPONENTS[window.appType] ||
-            (() => <AppPlaceholder appType={window.appType} />);
+            (() => (
+              <div className={styles.appPlaceholder}>
+                <h2 className={styles.appTitle}>App: {window.appType}</h2>
+                <p>
+                  This is a placeholder for the {window.appType} application
+                </p>
+              </div>
+            ));
 
           return (
             <Window

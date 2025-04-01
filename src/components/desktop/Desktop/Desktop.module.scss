@@ -52,9 +52,9 @@
   padding: 12px;
   z-index: 10; /* Above background, below windows */
   display: grid;
-  grid-template-columns: repeat(auto-fill, 80px);
-  grid-auto-rows: 100px;
-  grid-gap: 8px;
+  grid-template-columns: repeat(auto-fill, 80px); /* Fixed width columns */
+  grid-auto-rows: minmax(100px, auto); /* Minimum height with auto expansion */
+  grid-gap: 12px; /* Slightly larger gap for better separation */
   align-content: start;
 }
 
@@ -62,10 +62,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the top */
   text-align: center;
   width: 80px;
-  height: 100px;
+  height: auto; /* Allow height to adjust based on content */
+  min-height: 100px; /* Minimum height */
   padding: 8px;
   cursor: pointer;
   border-radius: 4px;
@@ -102,6 +103,44 @@
       box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
     }
   }
+}
+
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 8px;
+  background-color: rgba($cyber-dark-purple, 0.6);
+  border: 1px solid $cyber-neon-pink;
+  border-radius: 4px;
+  color: $cyber-text-light;
+  box-shadow: 0 0 5px rgba($cyber-neon-pink, 0.3);
+  flex-shrink: 0; /* Prevent icon from shrinking */
+
+  .desktopIcon:hover &,
+  .hovered & {
+    color: $cyber-neon-pink;
+    box-shadow: 0 0 8px rgba($cyber-neon-pink, 0.5);
+  }
+}
+
+.iconLabel {
+  font-family: $font-content;
+  font-size: 12px;
+  line-height: 1.2;
+  color: $cyber-text-light;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+  max-width: 100%;
+  height: auto; /* Allow height to adjust */
+  overflow: hidden;
+  display: -webkit-box;
+  line-clamp: 3;
+  -webkit-line-clamp: 3; /* Allow up to 3 lines */
+  -webkit-box-orient: vertical;
+  text-align: center;
+  word-break: break-word; /* Better word breaking for long filenames */
 }
 
 .iconWrapper {

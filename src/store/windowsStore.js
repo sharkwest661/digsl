@@ -12,6 +12,7 @@ const APP_TYPES = {
   FILE_EXPLORER: "fileExplorer",
   MUSIC_PLAYER: "musicPlayer",
   TERMINAL_APP: "terminalApp",
+  TEXT_VIEWER: "textViewer", // New app type
 };
 
 // Theme associations for each app
@@ -33,6 +34,7 @@ const DEFAULT_POSITIONS = {
   [APP_TYPES.FILE_EXPLORER]: { x: 180, y: 180, width: 600, height: 450 },
   [APP_TYPES.MUSIC_PLAYER]: { x: 200, y: 200, width: 350, height: 580 },
   [APP_TYPES.TERMINAL_APP]: { x: 220, y: 220, width: 650, height: 500 },
+  [APP_TYPES.TEXT_VIEWER]: { x: 240, y: 240, width: 700, height: 600 },
 };
 
 // Create the windows store
