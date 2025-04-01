@@ -1,27 +1,7 @@
 // store/audioStore.js
 import { create } from "zustand";
 
-// Load favorites from localStorage
-const loadFavoritesFromLocalStorage = () => {
-  try {
-    const savedFavorites = localStorage.getItem("music_favorites");
-    return savedFavorites ? JSON.parse(savedFavorites) : [];
-  } catch (error) {
-    console.error("Error loading music favorites from localStorage:", error);
-    return [];
-  }
-};
-
-// Save favorites to localStorage
-const saveFavoritesToLocalStorage = (favorites) => {
-  try {
-    localStorage.setItem("music_favorites", JSON.stringify(favorites));
-  } catch (error) {
-    console.error("Error saving music favorites to localStorage:", error);
-  }
-};
-
-// Audio store to manage persistent audio playback
+// Audio store to manage audio playback
 const useAudioStore = create((set, get) => ({
   // Audio control state
   isPlaying: false,
@@ -30,8 +10,8 @@ const useAudioStore = create((set, get) => ({
   duration: 0,
   currentTime: 0,
 
-  // Favorites
-  favorites: loadFavoritesFromLocalStorage(),
+  // Favorites - stored in memory only, not persisted
+  favorites: [],
 
   // Audio element reference
   audioElement: null,
@@ -161,10 +141,7 @@ const useAudioStore = create((set, get) => ({
       updatedFavorites = [...favorites, trackId];
     }
 
-    // Update localStorage
-    saveFavoritesToLocalStorage(updatedFavorites);
-
-    // Update state
+    // Update state only (no localStorage)
     set({ favorites: updatedFavorites });
 
     // Return the new favorite status
@@ -187,7 +164,15 @@ const useAudioStore = create((set, get) => ({
       audioElement.removeEventListener("durationchange", () => {});
       audioElement.removeEventListener("ended", () => {});
     }
-    set({ audioElement: null, isPlaying: false });
+    // Reset all state to initial values
+    set({
+      audioElement: null,
+      isPlaying: false,
+      currentTrackIndex: 0,
+      currentTime: 0,
+      duration: 0,
+      favorites: [], // Clear favorites when app is closed
+    });
   },
 }));
 
