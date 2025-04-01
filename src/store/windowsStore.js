@@ -182,20 +182,8 @@ const useWindowsStore = create((set, get) => ({
       // Toggle minimize state
       const isMinimized = !window.isMinimized;
 
-      // Special handling for music player when minimizing
-      if (window.appType === APP_TYPES.MUSIC_PLAYER && isMinimized) {
-        // Only pause the music when minimizing, don't reset state
-        import("./audioStore")
-          .then((module) => {
-            const audioStore = module.useAudioStore.getState();
-            if (audioStore.isPlaying) {
-              audioStore.togglePlay(); // Just pause on minimize
-            }
-          })
-          .catch((error) => {
-            console.error("Failed to import audioStore:", error);
-          });
-      }
+      // Remove the special handling for music player when minimizing
+      // This allows music to continue playing when minimized
 
       // Update windows
       const updatedWindows = state.windows.map((w) =>
