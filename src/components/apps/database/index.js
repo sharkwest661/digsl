@@ -1,4 +1,4 @@
-// components/apps/database/index.js
-import DatabaseSearch from "./DatabaseSearch";
+// src/components/apps/database/index.js
+import DatabaseApp from "./DatabaseApp";
 
-export default DatabaseSearch;
+export default DatabaseApp;

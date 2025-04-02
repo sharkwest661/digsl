@@ -1,782 +1,807 @@
-import { DATABASE_TYPES } from "../constants/app";
+// src/data/databaseRecords.js
+
+// Single database type
+export const DATABASE_TYPES = {
+  GOVERNMENT: "government",
+};
 
 // Mock database records
 export const DB_RECORDS = {
-  // Police records
-  [DATABASE_TYPES.POLICE]: [
+  // Government comprehensive database
+  [DATABASE_TYPES.GOVERNMENT]: [
+    // VICTIM 1: Alex Karimov (CobraSystems)
     {
-      id: "p-2835",
+      id: "gov-2835",
       name: "Alex Karimov",
-      caseNumbers: ["BPD-2023-0472"],
-      lastKnown: "Apartment 7B, Nizami Street 42, Baku",
+      dateOfBirth: "04/12/1978",
+      nationalID: "AZ19780412K",
       status: "Missing",
+      lastSeen: "03/15/2003",
+      address: "Apartment 7B, Nizami Street 42, Baku",
+      occupation: "Cybersecurity Specialist",
+      employer: "AzTech Solutions",
       description:
-        "Male, 32, reported missing on 03/15/2023. Known alias: 'CobraSystems'",
+        "Male, 25, reported missing on 03/15/2003. Known tech expertise in network security.",
       notes:
-        "Missing persons report filed by employer after 3 days of absence. Suspicious circumstances noted. Tech background with specialization in network security. No prior criminal record.",
+        "Missing persons report filed by employer after 3 days of absence. Tech background with specialization in network security. No prior criminal record.",
       details: {
-        height: "182cm",
-        weight: "78kg",
-        eyeColor: "Brown",
-        hairColor: "Black",
-        distinguishingFeatures: "Serpent tattoo on right forearm",
-        nationality: "Azerbaijani",
-        languages: "Azerbaijani, English, Russian",
-        occupation: "Cybersecurity Specialist",
-        employer: "AzTech Solutions",
-        emergencyContact: "None provided",
-        lastSeen: "03/12/2023 at NightOwl Internet Cafe",
-        caseOfficer: "Inspector Mammadov",
-        evidenceItems: [
-          "Personal laptop (encrypted)",
-          "Phone records (subpoenaed)",
-          "Building access logs",
-        ],
+        physical: {
+          height: "182cm",
+          weight: "78kg",
+          eyeColor: "Brown",
+          hairColor: "Black",
+          distinguishingFeatures: "Serpent tattoo on right forearm",
+        },
+        background: {
+          nationality: "Azerbaijani",
+          languages: "Azerbaijani, English, Russian",
+          education: "BSc Computer Science, Baku State University (2000)",
+          familyContacts:
+            "Father: Farid Karimov (citizen), Mother: Sevinj Karimova (deceased)",
+        },
+        employment: {
+          position: "Senior Network Security Specialist",
+          clearanceLevel: "High - Corporate Systems",
+          responsibilities:
+            "Corporate network security, penetration testing, security system design",
+          workHistory: [
+            {
+              employer: "AzTech Solutions",
+              position: "Senior Network Security Specialist",
+              dates: "05/2000 - Present",
+            },
+            {
+              employer: "DataSec Baku",
+              position: "Network Security Analyst",
+              dates: "06/1999 - 05/2000",
+            },
+          ],
+          certifications: [
+            "Certified Ethical Hacker",
+            "Cisco Certified Network Professional",
+          ],
+        },
+        financial: {
+          accountNumbers: ["BNA-7538294", "BNA-9638201"],
+          transactionFlags: "Large cryptocurrency exchanges detected",
+          transactionHistory: [
+            {
+              date: "03/10/2003",
+              type: "Withdrawal",
+              amount: "₼15,000",
+              description: "Cash withdrawal",
+            },
+            {
+              date: "03/01/2003",
+              type: "Deposit",
+              amount: "₼28,500",
+              description: "Transfer from unknown source",
+            },
+          ],
+          suspiciousActivity:
+            "Multiple large transfers to/from cryptocurrency exchanges",
+        },
+        medical: {
+          bloodType: "O+",
+          allergies: "None reported",
+          medications: "None current",
+          history: "Treated for wrist injury (2001)",
+        },
+        police: {
+          caseNumbers: ["BPD-2003-0472"],
+          criminalStatus: "No Criminal Record",
+          caseOfficer: "Inspector Mammadov",
+          evidenceItems: [
+            "Personal laptop (encrypted)",
+            "Phone records (subpoenaed)",
+            "Building access logs",
+          ],
+        },
+        travel: {
+          passportNumber: "AZE38204761",
+          travelHistory: [
+            {
+              date: "11/2002",
+              destination: "Turkey",
+            },
+            {
+              date: "06/2002",
+              destination: "UAE",
+            },
+            {
+              date: "02/2001",
+              destination: "Russia",
+            },
+          ],
+        },
       },
     },
+
+    // VICTIM 2: Dr. Leyla Mahmudova (GhostDoc)
     {
-      id: "p-3142",
+      id: "gov-3142",
       name: "Dr. Leyla Mahmudova",
-      caseNumbers: ["BPD-2023-0488"],
-      lastKnown: "Fountain Square Luxury Apartments, Apt 12C",
+      dateOfBirth: "07/23/1972",
+      nationalID: "AZ19720723M",
       status: "Missing",
+      lastSeen: "03/18/2003",
+      address: "Fountain Square Luxury Apartments, Apt 12C",
+      occupation: "Medical Doctor - Neurology",
+      employer: "Central City Hospital",
       description:
-        "Female, 38, reported missing on 03/18/2023. Employee ID badge found at scene. Possible alias: 'GhostDoc'",
+        "Female, 31, reported missing on 03/18/2003. Employee ID badge found at scene.",
       notes:
         "Hospital staff reported absence. Apartment found in disarray. Medical license under review for unspecified violations prior to disappearance.",
       details: {
-        height: "165cm",
-        weight: "62kg",
-        eyeColor: "Green",
-        hairColor: "Brown",
-        distinguishingFeatures: "Surgical scar on left wrist",
-        nationality: "Azerbaijani",
-        languages: "Azerbaijani, English, Turkish",
-        occupation: "Medical Doctor - Neurology",
-        employer: "Central City Hospital",
-        emergencyContact: "Farid Mahmudov (brother)",
-        lastSeen: "03/17/2023 at employer location",
-        caseOfficer: "Inspector Mammadov",
-        evidenceItems: ["Medical bag", "Hospital key card", "Prescription pad"],
+        physical: {
+          height: "165cm",
+          weight: "62kg",
+          eyeColor: "Green",
+          hairColor: "Brown",
+          distinguishingFeatures: "Surgical scar on left wrist",
+        },
+        background: {
+          nationality: "Azerbaijani",
+          languages: "Azerbaijani, English, Turkish",
+          education:
+            "MD, Baku Medical University (1995), Neurology Specialization (Berlin, 1997-1999)",
+          familyContacts:
+            "Brother: Farid Mahmudov (contact information on file)",
+        },
+        employment: {
+          position: "Neurologist - Senior Staff",
+          clearanceLevel: "High - Medical Records & Pharmaceutical",
+          responsibilities:
+            "Patient care, neurological assessment, prescription authority",
+          workHistory: [
+            {
+              employer: "Central City Hospital",
+              position: "Neurologist - Senior Staff",
+              dates: "03/2000 - Present",
+            },
+            {
+              employer: "MedPlus Clinic",
+              position: "Neurologist",
+              dates: "09/1999 - 03/2000",
+            },
+            {
+              employer: "Berlin Charité Hospital",
+              position: "Resident Physician",
+              dates: "06/1997 - 08/1999",
+            },
+          ],
+          certifications: [
+            "Board Certified Neurologist",
+            "Advanced Life Support",
+            "Neuropharmacology Certification",
+          ],
+        },
+        financial: {
+          accountNumbers: ["AZB-2674291", "AZB-2674292"],
+          transactionFlags: "Multiple offshore accounts",
+          transactionHistory: [
+            {
+              date: "03/15/2003",
+              type: "Transfer",
+              amount: "₼25,000",
+              description: "Transfer to Swiss account",
+            },
+            {
+              date: "03/01/2003",
+              type: "Deposit",
+              amount: "₼42,000",
+              description: "Unknown source",
+            },
+          ],
+          suspiciousActivity:
+            "Income inconsistent with medical profession salary",
+        },
+        medical: {
+          bloodType: "A-",
+          allergies: "Penicillin",
+          medications: "None current",
+          history: "Medical staff - annual checkups only",
+        },
+        police: {
+          caseNumbers: ["BPD-2003-0488"],
+          criminalStatus: "Professional Investigation",
+          caseOfficer: "Inspector Aliyev",
+          evidenceItems: [
+            "Medical bag",
+            "Hospital key card",
+            "Prescription pad",
+          ],
+        },
+        travel: {
+          passportNumber: "AZE26183047",
+          travelHistory: [
+            {
+              date: "09/2002",
+              destination: "Germany",
+            },
+            {
+              date: "05/2001",
+              destination: "UK",
+            },
+            {
+              date: "03/2000",
+              destination: "Switzerland",
+            },
+          ],
+        },
       },
     },
+
+    // VICTIM 3: Ibrahim Nasirov (Prometheus_X)
     {
-      id: "p-3298",
+      id: "gov-3298",
       name: "Ibrahim Nasirov",
-      caseNumbers: ["BPD-2023-0513"],
-      lastKnown: "Industrial District, White City Complex B",
+      dateOfBirth: "11/04/1965",
+      nationalID: "AZ19651104N",
       status: "Missing",
+      lastSeen: "03/25/2003",
+      address: "Industrial District, White City Complex B",
+      occupation: "Industrial Systems Engineer",
+      employer: "BakuOil Technologies",
       description:
-        "Male, 45, reported missing on 03/25/2023. Workplace ID and personal effects found at home. Possible alias: 'Prometheus_X'",
+        "Male, 38, reported missing on 03/25/2003. Workplace ID and personal effects found at home.",
       notes:
         "Former industrial engineer with access to sensitive infrastructure systems. Apartment electricity manually disabled before disappearance.",
       details: {
-        height: "175cm",
-        weight: "82kg",
-        eyeColor: "Brown",
-        hairColor: "Salt and pepper",
-        distinguishingFeatures: "Burn scar on right hand",
-        nationality: "Azerbaijani",
-        languages: "Azerbaijani, Russian, English",
-        occupation: "Industrial Systems Engineer",
-        employer: "BakuOil Technologies",
-        emergencyContact: "None listed",
-        lastSeen: "03/24/2023 entering his apartment building",
-        caseOfficer: "Inspector Aliyev",
-        evidenceItems: [
-          "Work laptop",
-          "Security access cards",
-          "Personal notebook with technical diagrams",
-        ],
+        physical: {
+          height: "175cm",
+          weight: "82kg",
+          eyeColor: "Brown",
+          hairColor: "Salt and pepper",
+          distinguishingFeatures: "Burn scar on right hand",
+        },
+        background: {
+          nationality: "Azerbaijani",
+          languages: "Azerbaijani, Russian, English",
+          education:
+            "MSc Industrial Engineering, Azerbaijan Technical University (1990)",
+          familyContacts: "No immediate family listed",
+        },
+        employment: {
+          position: "Senior Industrial Systems Engineer",
+          clearanceLevel: "Very High - Critical Infrastructure",
+          responsibilities:
+            "Design and maintenance of industrial control systems for oil production facilities",
+          workHistory: [
+            {
+              employer: "BakuOil Technologies",
+              position: "Senior Industrial Systems Engineer",
+              dates: "11/1998 - Present",
+            },
+            {
+              employer: "SOCAR",
+              position: "Systems Engineer",
+              dates: "04/1995 - 11/1998",
+            },
+            {
+              employer: "Azneft",
+              position: "Junior Engineer",
+              dates: "06/1990 - 04/1995",
+            },
+          ],
+          certifications: [
+            "Certified Industrial Control Systems Security Professional",
+            "Process Control Systems Specialist",
+          ],
+        },
+        financial: {
+          accountNumbers: ["CBA-1572839", "CBA-1891724"],
+          transactionFlags: "Frequent international wire transfers",
+          transactionHistory: [
+            {
+              date: "03/20/2003",
+              type: "Withdrawal",
+              amount: "₼20,000",
+              description: "Cash withdrawal",
+            },
+            {
+              date: "03/01/2003",
+              type: "Deposit",
+              amount: "₼45,000",
+              description: "Wire transfer from RusTech Industries",
+            },
+          ],
+          suspiciousActivity:
+            "Undisclosed foreign income, payments from sensitive industrial sectors",
+        },
+        medical: {
+          bloodType: "B+",
+          allergies: "None",
+          medications: "Lisinopril (10mg), Lorazepam (0.5mg)",
+          history:
+            "Hypertension (1998), Anxiety disorder (1999), Hand burn treatment (1995)",
+        },
+        police: {
+          caseNumbers: ["BPD-2003-0513"],
+          criminalStatus: "Intelligence Interest",
+          caseOfficer: "Inspector Aliyev",
+          evidenceItems: [
+            "Work laptop",
+            "Security access cards",
+            "Personal notebook with technical diagrams",
+          ],
+        },
+        travel: {
+          passportNumber: "AZE17294635",
+          travelHistory: [
+            {
+              date: "11/2002",
+              destination: "Russia",
+            },
+            {
+              date: "07/2002",
+              destination: "Russia",
+            },
+            {
+              date: "04/2001",
+              destination: "Turkey",
+            },
+            {
+              date: "02/2000",
+              destination: "Ukraine",
+            },
+          ],
+        },
       },
     },
-  ],
 
-  // Medical records
-  [DATABASE_TYPES.MEDICAL]: [
+    // VICTIM 4: Unknown real name (QuantumHarvest)
     {
-      id: "m-6742",
-      patientName: "Alex Karimov",
-      patientID: "ACH-73421",
-      dateOfBirth: "04/12/1991",
-      bloodType: "O+",
-      allergies: "None reported",
-      medications: "None current",
-      history: "Treated for wrist injury (2020), routine physical (2022)",
-      lastVisit: "01/15/2023",
-      physician: "Dr. Orhan Mammadli",
+      id: "gov-3517",
+      name: "Ruslan Babayev",
+      dateOfBirth: "02/18/1976",
+      nationalID: "AZ19760218B",
+      status: "Missing",
+      lastSeen: "04/02/2003",
+      address: "Tech District Apartments, Block C, Unit 505",
+      occupation: "Data Analyst",
+      employer: "DataSync Technologies",
+      description:
+        "Male, 27, reported missing on 04/02/2003. Computer found with all data wiped.",
       notes:
-        "Patient reported frequent headaches during last visit. Brain scan scheduled but never attended.",
+        "Known for exceptional programming skills. Previously consulted for government databases. Apartment found with sophisticated electronic equipment.",
       details: {
-        admissions: [
-          {
-            date: "09/12/2020",
-            reason: "Wrist injury from typing/computer use",
-            treatment:
-              "Anti-inflammatory medication, ergonomic recommendations",
-            discharge: "09/12/2020",
-          },
-        ],
-        vaccinations: "Up to date",
-        insuranceProvider: "AzMedical Health",
-        nextAppointment: "None scheduled",
-        medicalHistory: "No significant medical history",
-        familyHistory: "Father: Hypertension, Mother: Unknown",
-        attachments: ["Physical results (2022)", "Wrist X-ray (2020)"],
+        physical: {
+          height: "179cm",
+          weight: "75kg",
+          eyeColor: "Blue",
+          hairColor: "Blonde",
+          distinguishingFeatures: "Birthmark on back of neck",
+        },
+        background: {
+          nationality: "Azerbaijani",
+          languages: "Azerbaijani, English, German",
+          education:
+            "MSc Computer Science, Technical University of Berlin (2000)",
+          familyContacts:
+            "Parents (deceased), sister: Aysel Babayeva (contact information on file)",
+        },
+        employment: {
+          position: "Senior Data Analyst",
+          clearanceLevel: "High - Data Systems",
+          responsibilities:
+            "Database architecture, data mining algorithms, predictive analytics",
+          workHistory: [
+            {
+              employer: "DataSync Technologies",
+              position: "Senior Data Analyst",
+              dates: "06/2000 - Present",
+            },
+            {
+              employer: "Government Statistical Office",
+              position: "Consultant",
+              dates: "01/2000 - 06/2000",
+            },
+            {
+              employer: "Berlin Information Systems",
+              position: "Intern",
+              dates: "09/1998 - 12/1999",
+            },
+          ],
+          certifications: [
+            "Oracle Certified Database Expert",
+            "Microsoft Certified Data Professional",
+            "Advanced Data Mining Certification",
+          ],
+        },
+        financial: {
+          accountNumbers: ["KBB-4982176", "KBB-5103482"],
+          transactionFlags: "Unusual electronic transfers",
+          transactionHistory: [
+            {
+              date: "03/30/2003",
+              type: "Withdrawal",
+              amount: "₼18,500",
+              description: "Electronic transfer to anonymous account",
+            },
+            {
+              date: "03/15/2003",
+              type: "Deposit",
+              amount: "₼35,000",
+              description: "Wire transfer from overseas account",
+            },
+          ],
+          suspiciousActivity:
+            "Pattern of funds moving through multiple accounts before withdrawal",
+        },
+        medical: {
+          bloodType: "AB+",
+          allergies: "Shellfish",
+          medications: "None current",
+          history:
+            "Carpal tunnel syndrome (2001), Migraine treatment (ongoing)",
+        },
+        police: {
+          caseNumbers: ["BPD-2003-0547"],
+          criminalStatus: "No Criminal Record",
+          caseOfficer: "Inspector Guliyev",
+          evidenceItems: [
+            "Wiped computer systems",
+            "External hard drives (encrypted)",
+            "Surveillance equipment at residence",
+          ],
+        },
+        travel: {
+          passportNumber: "AZE48291756",
+          travelHistory: [
+            {
+              date: "01/2003",
+              destination: "Germany",
+            },
+            {
+              date: "10/2002",
+              destination: "United States",
+            },
+            {
+              date: "05/2001",
+              destination: "Japan",
+            },
+          ],
+        },
       },
     },
-    {
-      id: "m-7103",
-      patientName: "Leyla Mahmudova",
-      patientID: "ACH-45629",
-      dateOfBirth: "07/23/1985",
-      bloodType: "A-",
-      allergies: "Penicillin",
-      medications: "None current",
-      history: "Medical staff - annual checkups only",
-      lastVisit: "02/10/2023",
-      physician: "Self-administered tests",
-      notes:
-        "Dr. Mahmudova logged unusual access to pharmaceutical database (flagged by system).",
-      details: {
-        admissions: [],
-        vaccinations: "Up to date (required for medical staff)",
-        insuranceProvider: "Hospital Staff Coverage",
-        nextAppointment: "None scheduled",
-        medicalHistory: "No significant medical history",
-        familyHistory: "No significant history reported",
-        attachments: [
-          "Staff medical clearance (2023)",
-          "Drug screening (clean)",
-        ],
-      },
-    },
-    {
-      id: "m-7589",
-      patientName: "Ibrahim Nasirov",
-      patientID: "ACH-26735",
-      dateOfBirth: "11/04/1978",
-      bloodType: "B+",
-      allergies: "None",
-      medications: "Lisinopril (10mg), Lorazepam (0.5mg)",
-      history:
-        "Hypertension (2018), Anxiety disorder (2019), Hand burn treatment (2015)",
-      lastVisit: "03/10/2023",
-      physician: "Dr. Aysel Huseynova",
-      notes:
-        "Patient requested early medication refill. Reported increased work stress and difficulty sleeping.",
-      details: {
-        admissions: [
-          {
-            date: "07/15/2015",
-            reason: "Second-degree burn on right hand",
-            treatment: "Burn treatment, antibiotics, pain management",
-            discharge: "07/17/2015",
-          },
-        ],
-        vaccinations: "Up to date",
-        insuranceProvider: "BakuOil Corporate Health Plan",
-        nextAppointment: "04/10/2023 (missed)",
-        medicalHistory: "Hypertension, Anxiety disorder, Hand injury (2015)",
-        familyHistory: "Father: Heart disease, Mother: Diabetes",
-        attachments: ["Prescription history", "Psychiatric evaluation (2019)"],
-      },
-    },
-  ],
 
-  // Immigration records
-  [DATABASE_TYPES.IMMIGRATION]: [
+    // VICTIM 5: Unknown real name (MirrorMask)
     {
-      id: "i-12853",
-      fullName: "Alexander Karimov",
-      nationality: "Azerbaijani",
-      passportNumber: "AZE38204761",
-      dateOfBirth: "04/12/1991",
-      placeOfBirth: "Ganja, Azerbaijan",
-      status: "Citizen",
-      travelHistory: "Turkey (2022), UAE (2021), Russia (2020)",
-      notes: "No immigration violations",
+      id: "gov-3683",
+      name: "Nazrin Hasanova",
+      dateOfBirth: "09/30/1980",
+      nationalID: "AZ19800930H",
+      status: "Missing",
+      lastSeen: "04/10/2003",
+      address: "Artist District, Mir Apartment Building, Unit 12",
+      occupation: "Graphic Designer / Identity Consultant",
+      employer: "Creative Pulse Studios",
+      description:
+        "Female, 23, reported missing on 04/10/2003. Last seen leaving workplace. Known for exceptional forgery skills.",
+      notes:
+        "Apartment contained multiple identity documents under different names. Specialized in document reproduction and graphic design.",
       details: {
-        addresses: [
-          "Nizami Street 42, Apt 7B, Baku (current)",
-          "Tabriz Street 17, Ganja (previous)",
-        ],
-        entryExitRecords: [
-          {
-            date: "06/15/2022",
-            direction: "Exit",
-            destination: "Istanbul, Turkey",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "06/22/2022",
-            direction: "Entry",
-            origin: "Istanbul, Turkey",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "11/03/2021",
-            direction: "Exit",
-            destination: "Dubai, UAE",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "11/10/2021",
-            direction: "Entry",
-            origin: "Dubai, UAE",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "02/17/2020",
-            direction: "Exit",
-            destination: "Moscow, Russia",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "02/25/2020",
-            direction: "Entry",
-            origin: "Moscow, Russia",
-            port: "Heydar Aliyev International Airport",
-          },
-        ],
-        visaHistory: "Not applicable (citizen)",
-        familyMembers:
-          "Father: Farid Karimov (citizen), Mother: Sevinj Karimova (deceased)",
-        additionalDocs: ["National ID card", "Birth certificate"],
-        securityNotes: "None",
-        biometricData: "Fingerprints on file",
+        physical: {
+          height: "168cm",
+          weight: "58kg",
+          eyeColor: "Brown",
+          hairColor: "Black (frequently changes color)",
+          distinguishingFeatures: "Small tattoo of mirror on left wrist",
+        },
+        background: {
+          nationality: "Azerbaijani",
+          languages: "Azerbaijani, English, Turkish, Russian",
+          education: "Fine Arts Degree, Baku Academy of Arts (2000)",
+          familyContacts:
+            "Mother: Aygun Hasanova (contact information on file)",
+        },
+        employment: {
+          position: "Senior Graphic Designer",
+          clearanceLevel: "Standard",
+          responsibilities:
+            "Document design, identity materials, creative direction",
+          workHistory: [
+            {
+              employer: "Creative Pulse Studios",
+              position: "Senior Graphic Designer",
+              dates: "01/2001 - Present",
+            },
+            {
+              employer: "Baku Document Services",
+              position: "Document Specialist",
+              dates: "06/2000 - 12/2000",
+            },
+          ],
+          certifications: [
+            "Adobe Certified Expert",
+            "Security Printing Specialist",
+            "Digital Forensics Awareness (government training)",
+          ],
+        },
+        financial: {
+          accountNumbers: ["IBB-7391042", "IBB-8273940"],
+          transactionFlags: "Multiple identities linked to accounts",
+          transactionHistory: [
+            {
+              date: "04/05/2003",
+              type: "Withdrawal",
+              amount: "₼12,000",
+              description: "Cash withdrawal",
+            },
+            {
+              date: "03/25/2003",
+              type: "Deposit",
+              amount: "₼30,000",
+              description: "Source unknown",
+            },
+          ],
+          suspiciousActivity:
+            "Accounts under multiple names traced to same individual",
+        },
+        medical: {
+          bloodType: "A+",
+          allergies: "Latex",
+          medications: "None current",
+          history: "Eye examination (2002), Corrective lenses prescribed",
+        },
+        police: {
+          caseNumbers: ["BPD-2003-0582"],
+          criminalStatus: "Prior Investigation",
+          caseOfficer: "Inspector Mammadov",
+          evidenceItems: [
+            "Multiple passports (different identities)",
+            "Printing equipment",
+            "Design templates for official documents",
+          ],
+        },
+        travel: {
+          passportNumber: "AZE36194728",
+          travelHistory: [
+            {
+              date: "02/2003",
+              destination: "Turkey",
+            },
+            {
+              date: "11/2002",
+              destination: "Georgia",
+            },
+            {
+              date: "06/2001",
+              destination: "Ukraine",
+            },
+          ],
+        },
       },
     },
-    {
-      id: "i-10967",
-      fullName: "Leyla Mahmudova",
-      nationality: "Azerbaijani",
-      passportNumber: "AZE26183047",
-      dateOfBirth: "07/23/1985",
-      placeOfBirth: "Baku, Azerbaijan",
-      status: "Citizen",
-      travelHistory: "Germany (2022), UK (2021), Switzerland (2019)",
-      notes: "No immigration violations",
-      details: {
-        addresses: [
-          "Fountain Square Luxury Apartments, Apt 12C, Baku (current)",
-        ],
-        entryExitRecords: [
-          {
-            date: "09/10/2022",
-            direction: "Exit",
-            destination: "Frankfurt, Germany",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "09/17/2022",
-            direction: "Entry",
-            origin: "Frankfurt, Germany",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "05/22/2021",
-            direction: "Exit",
-            destination: "London, UK",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "06/05/2021",
-            direction: "Entry",
-            origin: "London, UK",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "03/15/2019",
-            direction: "Exit",
-            destination: "Zurich, Switzerland",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "03/22/2019",
-            direction: "Entry",
-            origin: "Zurich, Switzerland",
-            port: "Heydar Aliyev International Airport",
-          },
-        ],
-        visaHistory: "Not applicable (citizen)",
-        familyMembers: "Brother: Farid Mahmudov (citizen)",
-        additionalDocs: ["National ID card", "Medical license"],
-        securityNotes: "None",
-        biometricData: "Fingerprints on file",
-      },
-    },
-    {
-      id: "i-09321",
-      fullName: "Ibrahim Nasirov",
-      nationality: "Azerbaijani",
-      passportNumber: "AZE17294635",
-      dateOfBirth: "11/04/1978",
-      placeOfBirth: "Baku, Azerbaijan",
-      status: "Citizen",
-      travelHistory: "Russia (2022, 2021, 2020), Turkey (2021), Ukraine (2019)",
-      notes: "Multiple business trips to Russian Federation",
-      details: {
-        addresses: [
-          "Industrial District, White City Complex B, Unit 503, Baku (current)",
-        ],
-        entryExitRecords: [
-          {
-            date: "11/23/2022",
-            direction: "Exit",
-            destination: "Moscow, Russia",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "11/30/2022",
-            direction: "Entry",
-            origin: "Moscow, Russia",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "07/11/2022",
-            direction: "Exit",
-            destination: "St. Petersburg, Russia",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "07/18/2022",
-            direction: "Entry",
-            origin: "St. Petersburg, Russia",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "04/25/2021",
-            direction: "Exit",
-            destination: "Ankara, Turkey",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "05/02/2021",
-            direction: "Entry",
-            origin: "Ankara, Turkey",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "02/12/2019",
-            direction: "Exit",
-            destination: "Kyiv, Ukraine",
-            port: "Heydar Aliyev International Airport",
-          },
-          {
-            date: "02/19/2019",
-            direction: "Entry",
-            origin: "Kyiv, Ukraine",
-            port: "Heydar Aliyev International Airport",
-          },
-        ],
-        visaHistory: "Not applicable (citizen)",
-        familyMembers: "No immediate family listed",
-        additionalDocs: [
-          "National ID card",
-          "Professional engineering certification",
-        ],
-        securityNotes:
-          "Secondary screening performed after 2022 Russia visit due to extended industrial site visits",
-        biometricData: "Fingerprints on file",
-      },
-    },
-  ],
 
-  // Financial records
-  [DATABASE_TYPES.FINANCIAL]: [
+    // Additional People
     {
-      id: "f-38294",
-      name: "Alex Karimov",
-      accountNumbers: ["BNA-7538294", "BNA-9638201"],
-      taxID: "AZ19910412KRM",
-      employmentStatus: "Employed",
-      incomeLevel: "High",
-      transactionFlags: "Large cryptocurrency exchanges detected",
-      notes: "Unusual pattern of foreign funds transfers in past 6 months",
+      id: "gov-1024",
+      name: "Eldar Mammadov",
+      dateOfBirth: "05/17/1962",
+      nationalID: "AZ19620517M",
+      status: "Active",
+      address: "27 Nizami Street, Baku",
+      occupation: "Police Inspector",
+      employer: "Baku Police Department",
+      description:
+        "Male, 41, lead investigator on multiple missing persons cases.",
+      notes:
+        "Decorated officer with 20 years of service. Currently investigating recent disappearances.",
       details: {
-        accountSummary: [
-          {
-            type: "Checking",
-            number: "BNA-7538294",
-            balance: "₼2,890",
-            status: "Active",
-          },
-          {
-            type: "Savings",
-            number: "BNA-9638201",
-            balance: "₼57,430",
-            status: "Active",
-          },
-        ],
-        transactionHistory: [
-          {
-            date: "03/10/2023",
-            type: "Withdrawal",
-            amount: "₼15,000",
-            description: "Cash withdrawal",
-          },
-          {
-            date: "03/01/2023",
-            type: "Deposit",
-            amount: "₼28,500",
-            description: "Transfer from unknown source",
-          },
-          {
-            date: "02/15/2023",
-            type: "Withdrawal",
-            amount: "₼5,000",
-            description: "Cash withdrawal",
-          },
-          {
-            date: "02/01/2023",
-            type: "Deposit",
-            amount: "₼32,000",
-            description: "Transfer from cryptocurrency exchange",
-          },
-        ],
-        cryptoWallets: ["Identified but addresses classified"],
-        taxHistory: "Up to date, last filing: January 2023",
-        propertyOwnership: "None registered",
-        creditScore: "Excellent (790)",
-        loans: "None active",
-        suspiciousActivity:
-          "Multiple large transfers to/from cryptocurrency exchanges",
+        physical: {
+          height: "180cm",
+          weight: "85kg",
+          eyeColor: "Brown",
+          hairColor: "Black with gray",
+        },
+        background: {
+          nationality: "Azerbaijani",
+          languages: "Azerbaijani, Russian",
+          education: "Police Academy, Baku (1985)",
+        },
+        employment: {
+          position: "Senior Inspector, Missing Persons Division",
+          clearanceLevel: "High - Law Enforcement",
+          workHistory: [
+            {
+              employer: "Baku Police Department",
+              position: "Senior Inspector",
+              dates: "1995 - Present",
+            },
+            {
+              employer: "Baku Police Department",
+              position: "Patrol Officer",
+              dates: "1985 - 1995",
+            },
+          ],
+        },
       },
     },
     {
-      id: "f-42153",
-      name: "Leyla Mahmudova",
-      accountNumbers: ["AZB-2674291", "AZB-2674292"],
-      taxID: "AZ19850723MHM",
-      employmentStatus: "Employed",
-      incomeLevel: "Very High",
-      transactionFlags: "Multiple offshore accounts",
+      id: "gov-1156",
+      name: "Aysel Guliyeva",
+      dateOfBirth: "03/24/1975",
+      nationalID: "AZ19750324G",
+      status: "Active",
+      address: "Fountain Square Residences, Block A, Apt 42",
+      occupation: "Software Developer",
+      employer: "BakuTech Solutions",
+      description: "Female, 28, programmer specializing in database systems.",
       notes:
-        "Significant increase in deposits over past year without corresponding salary increase",
-      details: {
-        accountSummary: [
-          {
-            type: "Checking",
-            number: "AZB-2674291",
-            balance: "₼8,320",
-            status: "Active",
-          },
-          {
-            type: "Savings",
-            number: "AZB-2674292",
-            balance: "₼205,850",
-            status: "Active",
-          },
-        ],
-        transactionHistory: [
-          {
-            date: "03/15/2023",
-            type: "Transfer",
-            amount: "₼25,000",
-            description: "Transfer to Swiss account",
-          },
-          {
-            date: "03/01/2023",
-            type: "Deposit",
-            amount: "₼42,000",
-            description: "Unknown source",
-          },
-          {
-            date: "02/15/2023",
-            type: "Withdrawal",
-            amount: "₼10,000",
-            description: "Cash withdrawal",
-          },
-          {
-            date: "02/01/2023",
-            type: "Deposit",
-            amount: "₼38,000",
-            description: "Unknown source",
-          },
-        ],
-        cryptoWallets: ["None identified"],
-        taxHistory: "Up to date, last filing: January 2023",
-        propertyOwnership: "Fountain Square Luxury Apartment (purchased 2021)",
-        creditScore: "Excellent (810)",
-        loans: "Mortgage: ₼450,000 (2021-2051)",
-        suspiciousActivity:
-          "Income inconsistent with medical profession salary",
-      },
+        "Currently working on government database project. No criminal record.",
     },
     {
-      id: "f-36728",
-      name: "Ibrahim Nasirov",
-      accountNumbers: ["CBA-1572839", "CBA-1891724"],
-      taxID: "AZ19781104NSR",
-      employmentStatus: "Employed",
-      incomeLevel: "High",
-      transactionFlags: "Frequent international wire transfers",
+      id: "gov-1287",
+      name: "Rashad Aliyev",
+      dateOfBirth: "11/08/1968",
+      nationalID: "AZ19681108A",
+      status: "Active",
+      address: "45 Republic Avenue, Baku",
+      occupation: "Pharmacist",
+      employer: "Central City Pharmacy",
+      description:
+        "Male, 35, licensed pharmacist with access to controlled substances.",
       notes:
-        "Multiple payments from industrial companies in neighboring countries",
-      details: {
-        accountSummary: [
-          {
-            type: "Checking",
-            number: "CBA-1572839",
-            balance: "₼5,720",
-            status: "Active",
-          },
-          {
-            type: "Savings",
-            number: "CBA-1891724",
-            balance: "₼124,530",
-            status: "Active",
-          },
-        ],
-        transactionHistory: [
-          {
-            date: "03/20/2023",
-            type: "Withdrawal",
-            amount: "₼20,000",
-            description: "Cash withdrawal",
-          },
-          {
-            date: "03/01/2023",
-            type: "Deposit",
-            amount: "₼45,000",
-            description: "Wire transfer from RusTech Industries",
-          },
-          {
-            date: "02/15/2023",
-            type: "Withdrawal",
-            amount: "₼8,000",
-            description: "Cash withdrawal",
-          },
-          {
-            date: "02/01/2023",
-            type: "Deposit",
-            amount: "₼42,000",
-            description: "Wire transfer from RusTech Industries",
-          },
-        ],
-        cryptoWallets: ["One identified wallet with substantial activity"],
-        taxHistory: "Up to date, last filing: January 2023",
-        propertyOwnership: "White City Apartment (purchased 2018)",
-        creditScore: "Good (720)",
-        loans: "Mortgage: ₼320,000 (2018-2048)",
-        suspiciousActivity:
-          "Undisclosed foreign income, payments from sensitive industrial sectors",
-      },
-    },
-  ],
-
-  // Employment records
-  [DATABASE_TYPES.EMPLOYMENT]: [
-    {
-      id: "e-62938",
-      name: "Alex Karimov",
-      currentEmployer: "AzTech Solutions",
-      position: "Senior Network Security Specialist",
-      employmentStatus: "Missing - Employment Suspended",
-      startDate: "05/15/2018",
-      clearanceLevel: "High - Corporate Systems",
-      securityIncidents: "None reported",
-      notes:
-        "Specialized in network penetration testing and security systems. Last accessed company systems 03/11/2023 at 23:47.",
-      details: {
-        responsibilities:
-          "Corporate network security, penetration testing, security system design",
-        performance: "Excellent - last review January 2023",
-        accessPrivileges:
-          "Full access to network infrastructure, security systems, client data",
-        salary: "₼85,000 annually + performance bonuses",
-        supervisors: "Elmar Hajiyev (IT Director)",
-        workHistory: [
-          {
-            employer: "AzTech Solutions",
-            position: "Senior Network Security Specialist",
-            dates: "05/15/2018 - Present",
-          },
-          {
-            employer: "DataSec Baku",
-            position: "Network Security Analyst",
-            dates: "06/2015 - 05/2018",
-          },
-          {
-            employer: "BakuTel",
-            position: "Junior IT Specialist",
-            dates: "08/2013 - 06/2015",
-          },
-        ],
-        education: "BSc Computer Science, Baku State University (2013)",
-        certifications: [
-          "Certified Ethical Hacker",
-          "Cisco Certified Network Professional",
-          "CompTIA Security+",
-        ],
-        projects: [
-          "Corporate firewall redesign (2022)",
-          "Banking security systems (2020-2021)",
-        ],
-        attendanceRecord: "Exemplary until disappearance",
-      },
+        "No suspicious activity. Regular inventory checks show no discrepancies.",
     },
     {
-      id: "e-57291",
-      name: "Dr. Leyla Mahmudova",
-      currentEmployer: "Central City Hospital",
-      position: "Neurologist - Senior Staff",
-      employmentStatus: "Missing - Employment Suspended",
-      startDate: "03/10/2016",
-      clearanceLevel: "High - Medical Records & Pharmaceutical",
-      securityIncidents: "Unauthorized database access (03/15/2023)",
-      notes:
-        "Respected physician with specialty in neurological disorders. Flagged for unusual database access patterns week before disappearance.",
-      details: {
-        responsibilities:
-          "Patient care, neurological assessment, prescription authority",
-        performance: "Outstanding - last review December 2022",
-        accessPrivileges:
-          "Full access to medical records, pharmaceutical inventory, restricted medications",
-        salary: "₼120,000 annually",
-        supervisors: "Dr. Javid Aliyev (Chief of Medicine)",
-        workHistory: [
-          {
-            employer: "Central City Hospital",
-            position: "Neurologist - Senior Staff",
-            dates: "03/10/2016 - Present",
-          },
-          {
-            employer: "MedPlus Clinic",
-            position: "Neurologist",
-            dates: "09/2012 - 03/2016",
-          },
-          {
-            employer: "Berlin Charité Hospital",
-            position: "Resident Physician",
-            dates: "06/2010 - 08/2012",
-          },
-        ],
-        education:
-          "MD, Baku Medical University (2008), Neurology Specialization (Berlin, 2010-2012)",
-        certifications: [
-          "Board Certified Neurologist",
-          "Advanced Life Support",
-          "Neuropharmacology Certification",
-        ],
-        projects: [
-          "Neurological research study (2020-2022)",
-          "Medical student mentorship program",
-        ],
-        attendanceRecord: "Perfect until disappearance",
-      },
+      id: "gov-1342",
+      name: "Leyla Jafarova",
+      dateOfBirth: "07/19/1977",
+      nationalID: "AZ19770719J",
+      status: "Active",
+      address: "Green Hills Complex, Building C, Apt 78",
+      occupation: "Network Administrator",
+      employer: "AzerbaijanTel",
+      description:
+        "Female, 26, manages network infrastructure for telecommunications company.",
+      notes: "High security clearance. No suspicious activity noted.",
     },
     {
-      id: "e-48672",
-      name: "Ibrahim Nasirov",
-      currentEmployer: "BakuOil Technologies",
-      position: "Senior Industrial Systems Engineer",
-      employmentStatus: "Missing - Employment Suspended",
-      startDate: "11/05/2015",
-      clearanceLevel: "Very High - Critical Infrastructure",
-      securityIncidents:
-        "Unauthorized download of system schematics (03/20/2023)",
+      id: "gov-1476",
+      name: "Fuad Nasirov",
+      dateOfBirth: "02/05/1979",
+      nationalID: "AZ19790205N",
+      status: "Active",
+      address: "Seaside Apartments, Block D, Unit 34",
+      occupation: "Electrical Engineer",
+      employer: "Baku Power Distribution",
+      description: "Male, 24, works on power grid infrastructure.",
       notes:
-        "Specialized in industrial control systems. Downloaded sensitive infrastructure documents days before disappearance.",
-      details: {
-        responsibilities:
-          "Design and maintenance of industrial control systems for oil production facilities",
-        performance: "Above Average - last review February 2023",
-        accessPrivileges:
-          "High-level access to infrastructure systems, SCADA networks, facility schematics",
-        salary: "₼92,000 annually",
-        supervisors: "Rashad Mammadov (Engineering Director)",
-        workHistory: [
-          {
-            employer: "BakuOil Technologies",
-            position: "Senior Industrial Systems Engineer",
-            dates: "11/05/2015 - Present",
-          },
-          {
-            employer: "SOCAR",
-            position: "Systems Engineer",
-            dates: "04/2010 - 11/2015",
-          },
-          {
-            employer: "Azneft",
-            position: "Junior Engineer",
-            dates: "06/2003 - 04/2010",
-          },
-        ],
-        education:
-          "MSc Industrial Engineering, Azerbaijan Technical University (2003)",
-        certifications: [
-          "Certified Industrial Control Systems Security Professional",
-          "Process Control Systems Specialist",
-        ],
-        projects: [
-          "Modernization of Legacy Control Systems (2021-2023)",
-          "Safety Protocol Implementation (2019-2020)",
-        ],
-        attendanceRecord:
-          "Regular authorized travel to industrial sites, no unexplained absences until disappearance",
-      },
-    },
-  ],
-
-  // Criminal records
-  [DATABASE_TYPES.CRIMINAL]: [
-    {
-      id: "c-27913",
-      name: "Alex Karimov",
-      nationalID: "AZ19910412K",
-      criminalStatus: "No Criminal Record",
-      watchlistStatus: "Not on watchlist",
-      interpol: "No alerts",
-      notes:
-        "No criminal history. Subject in ongoing missing persons investigation.",
-      details: {
-        knownAssociates: "None with criminal records",
-        warnings: "Tech skills could enable cybercrime",
-        priorInvestigations: "None",
-        fingerprintsOnFile: true,
-        dnaOnFile: false,
-        lastUpdate: "03/16/2023 - Added to missing persons registry",
-      },
+        "Regular security clearance. Cousin of missing person Ibrahim Nasirov - no contact in past 2 years.",
     },
     {
-      id: "c-31456",
-      name: "Leyla Mahmudova",
-      nationalID: "AZ19850723M",
-      criminalStatus: "Professional Investigation",
-      watchlistStatus: "Medical Licensing Board Watchlist",
-      interpol: "No alerts",
+      id: "gov-1589",
+      name: "Sabina Mammadova",
+      dateOfBirth: "08/12/1982",
+      nationalID: "AZ19820812M",
+      status: "Active",
+      address: "Student Housing Complex, Room 203",
+      occupation: "Student",
+      employer: "Baku State University",
+      description:
+        "Female, 21, computer science student with exceptional programming skills.",
       notes:
-        "Under investigation by Medical Licensing Board for prescription irregularities prior to disappearance.",
-      details: {
-        knownAssociates: "None with criminal records",
-        warnings: "Access to restricted pharmaceuticals",
-        priorInvestigations:
-          "Medical Board review (ongoing at time of disappearance)",
-        fingerprintsOnFile: true,
-        dnaOnFile: true,
-        lastUpdate: "03/19/2023 - Added to missing persons registry",
-      },
+        "Flagged for attempting to access university security systems (2002). Warning issued.",
     },
     {
-      id: "c-29874",
-      name: "Ibrahim Nasirov",
-      nationalID: "AZ19781104N",
-      criminalStatus: "Intelligence Interest",
-      watchlistStatus: "Critical Infrastructure Protection",
-      interpol: "No alerts",
+      id: "gov-1672",
+      name: "Orkhan Huseynov",
+      dateOfBirth: "06/28/1970",
+      nationalID: "AZ19700628H",
+      status: "Active",
+      address: "42 Samad Vurgun Street, Baku",
+      occupation: "Medical Doctor",
+      employer: "Private Practice",
+      description: "Male, 33, psychiatrist with private practice.",
       notes:
-        "Monitored due to access to critical infrastructure. Known contact with foreign industrial entities.",
-      details: {
-        knownAssociates: "Contacts in Russian industrial sector (non-criminal)",
-        warnings: "Access to critical infrastructure systems",
-        priorInvestigations:
-          "Counter-intelligence assessment (2022) - No action taken",
-        fingerprintsOnFile: true,
-        dnaOnFile: true,
-        lastUpdate: "03/26/2023 - Added to missing persons registry",
-      },
+        "Prescribed controlled substances to patient Dr. Leyla Mahmudova for anxiety (2002).",
+    },
+    {
+      id: "gov-1785",
+      name: "Gulnara Azizova",
+      dateOfBirth: "04/09/1973",
+      nationalID: "AZ19730409A",
+      status: "Active",
+      address: "Old City District, 15 Maiden Tower Street",
+      occupation: "Document Specialist",
+      employer: "Ministry of Internal Affairs",
+      description: "Female, 30, processes official identity documents.",
+      notes:
+        "Security clearance for sensitive document processing. No suspicious activity.",
+    },
+    {
+      id: "gov-1832",
+      name: "Tural Mammadli",
+      dateOfBirth: "12/17/1974",
+      nationalID: "AZ19741217M",
+      status: "Person of Interest",
+      address: "Unknown - Last known: 67 Oil Workers Avenue, Baku",
+      occupation: "Computer Programmer",
+      employer: "Self-employed",
+      description:
+        "Male, 29, freelance programmer with focus on security systems.",
+      notes:
+        "Under investigation for possible cyber crimes. Not directly connected to missing persons cases.",
+    },
+    {
+      id: "gov-1947",
+      name: "Kamala Hasanova",
+      dateOfBirth: "05/30/1980",
+      nationalID: "AZ19800530H",
+      status: "Active",
+      address: "Artists' District, Mirror Building, Apt 56",
+      occupation: "Graphic Designer",
+      employer: "Baku Marketing Group",
+      description: "Female, 23, sister of missing person Nazrin Hasanova.",
+      notes: "Cooperating with investigation. No suspicious activity noted.",
+    },
+    {
+      id: "gov-2053",
+      name: "Murad Jafarov",
+      dateOfBirth: "09/21/1969",
+      nationalID: "AZ19690921J",
+      status: "Active",
+      address: "28 Parliament Avenue, Baku",
+      occupation: "Systems Administrator",
+      employer: "Ministry of Communications",
+      description: "Male, 34, manages government computer systems.",
+      notes:
+        "High security clearance. Regular background checks show no issues.",
+    },
+    {
+      id: "gov-2164",
+      name: "Fidan Karimova",
+      dateOfBirth: "11/03/1981",
+      nationalID: "AZ19811103K",
+      status: "Active",
+      address: "University Staff Housing, Block B, Unit 17",
+      occupation: "Research Assistant",
+      employer: "Azerbaijan Technical University",
+      description:
+        "Female, 22, research assistant in industrial engineering department.",
+      notes:
+        "Cousin of missing person Alex Karimov. Interviewed as part of investigation.",
+    },
+    {
+      id: "gov-2278",
+      name: "Elchin Maharramov",
+      dateOfBirth: "03/12/1972",
+      nationalID: "AZ19720312M",
+      status: "Active",
+      address: "Military Housing Complex, Building 4, Apt 23",
+      occupation: "Security Consultant",
+      employer: "Defense Ministry",
+      description:
+        "Male, 31, former military, now civilian consultant on security protocols.",
+      notes: "High security clearance. No suspicious activity noted.",
+    },
+    {
+      id: "gov-2385",
+      name: "Nigar Aliyeva",
+      dateOfBirth: "07/09/1978",
+      nationalID: "AZ19780709A",
+      status: "Active",
+      address: "Central District, 45 Freedom Street, Apt 12",
+      occupation: "Database Administrator",
+      employer: "National Bank of Azerbaijan",
+      description: "Female, 25, manages financial database systems.",
+      notes: "High security clearance. No unusual financial activity detected.",
+    },
+    {
+      id: "gov-2492",
+      name: "Anar Babayev",
+      dateOfBirth: "01/28/1971",
+      nationalID: "AZ19710128B",
+      status: "Active",
+      address: "45 Victory Street, Baku",
+      occupation: "Information Security Officer",
+      employer: "SOCAR (State Oil Company)",
+      description: "Male, 32, manages information security for oil company.",
+      notes:
+        "Attended same university as missing person Ibrahim Nasirov. No direct connection established.",
     },
   ],
 };

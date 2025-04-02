@@ -12,12 +12,3 @@ export const GLITCH_EFFECT_INTERVAL = 5000; // Interval between random glitch ef
 export const PROGRESS_UPDATE_INTERVAL = 30; // 300 Interval for updating loading progress
 
 // Other constants could be added here
-// Database types
-export const DATABASE_TYPES = {
-  POLICE: "police",
-  MEDICAL: "medical",
-  IMMIGRATION: "immigration",
-  FINANCIAL: "financial",
-  EMPLOYMENT: "employment",
-  CRIMINAL: "criminal",
-};
