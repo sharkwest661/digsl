@@ -11,8 +11,9 @@ import {
 } from "lucide-react";
 import { useThemeStore, useSearchEngineStore } from "../../../store";
 import { Scanlines } from "../../effects/Scanlines";
-import WebContent, { WEB_CONTENT } from "./WebContent";
+import WebContent from "./WebContent";
 import styles from "./SearchEngine.module.scss";
+import { WEB_CONTENT } from "../../../data/webContent";
 
 // Common search terms relevant to the investigation
 const SUGGESTED_SEARCHES = [

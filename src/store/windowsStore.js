@@ -26,7 +26,7 @@ const APP_THEMES = {
 // Default positions for initial window placement
 const DEFAULT_POSITIONS = {
   [APP_TYPES.DARK_WEB]: { x: 50, y: 50, width: 1200, height: 650 },
-  [APP_TYPES.SEARCH_ENGINE]: { x: 80, y: 80, width: 900, height: 650 },
+  [APP_TYPES.SEARCH_ENGINE]: { x: 80, y: 80, width: 1000, height: 750 },
   [APP_TYPES.DATABASE]: { x: 100, y: 100, width: 1100, height: 750 },
   [APP_TYPES.EVIDENCE_BOARD]: { x: 120, y: 120, width: 900, height: 650 },
   [APP_TYPES.EMAIL]: { x: 140, y: 140, width: 650, height: 500 },
