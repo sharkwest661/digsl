@@ -10,7 +10,7 @@ import { useNotepadStore } from "./notepadStore";
 import { useAudioStore } from "./audioStore";
 import { useDarkWebStore } from "./darkWebStore";
 import { useEvidenceBoardStore } from "./evidenceBoardStore";
-import { useDatabaseStore, DATABASE_TYPES } from "./databaseStore";
+import { useDatabaseStore } from "./databaseStore";
 import { useSearchEngineStore } from "./searchEngineStore";
 import { useTextViewerStore } from "./textViewerStore";
 import terminalStore from "./terminalStore";
@@ -43,7 +43,6 @@ export {
 
   // Database store
   useDatabaseStore,
-  DATABASE_TYPES,
 
   // Search Engine store
   useSearchEngineStore,
